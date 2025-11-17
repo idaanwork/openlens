@@ -1,0 +1,2523 @@
+<!doctype html>
+<html lang="en">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Infrys OpenLens - Software Inventory &amp; Compliance Platform</title>
+  <script src="/_sdk/data_sdk.js"></script>
+  <script src="/_sdk/element_sdk.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {
+      box-sizing: border-box;
+    }
+    
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+    }
+
+    .gradient-bg {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+
+    .gradient-text {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .nav-link {
+      padding: 12px 24px;
+      border-radius: 8px;
+      transition: all 0.3s ease;
+      cursor: pointer;
+      color: white;
+    }
+
+    .nav-link:hover {
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .nav-link.active {
+      background: rgba(255, 255, 255, 0.2);
+      font-weight: bold;
+    }
+
+    .role-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .role-admin {
+      background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+      color: white;
+    }
+
+    .role-legal {
+      background: linear-gradient(135deg, #a855f7 0%, #9333ea 100%);
+      color: white;
+    }
+
+    .role-dev {
+      background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+      color: white;
+    }
+
+    .stat-card {
+      background: white;
+      border-radius: 16px;
+      padding: 24px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+      transition: all 0.3s ease;
+    }
+
+    .stat-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 20px rgba(102, 126, 234, 0.2);
+    }
+
+    .library-card {
+      background: white;
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+      transition: all 0.3s ease;
+      border: 2px solid transparent;
+    }
+
+    .library-card:hover {
+      border-color: #667eea;
+      box-shadow: 0 4px 16px rgba(102, 126, 234, 0.2);
+    }
+
+    .status-badge {
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .status-approved {
+      background: #dcfce7;
+      color: #166534;
+    }
+
+    .status-pending {
+      background: #fef3c7;
+      color: #92400e;
+    }
+
+    .status-rejected {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
+    .vuln-critical {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
+    .vuln-high {
+      background: #fed7aa;
+      color: #9a3412;
+    }
+
+    .vuln-medium {
+      background: #fef3c7;
+      color: #92400e;
+    }
+
+    .vuln-low {
+      background: #dbeafe;
+      color: #1e40af;
+    }
+
+    .vuln-none {
+      background: #dcfce7;
+      color: #166534;
+    }
+
+    .modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      padding: 20px;
+    }
+
+    .modal-content {
+      background: white;
+      border-radius: 24px;
+      max-width: 800px;
+      width: 100%;
+      max-height: 90%;
+      overflow-y: auto;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: white;
+      padding: 16px 24px;
+      border-radius: 12px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+      border-left: 4px solid #667eea;
+      z-index: 2000;
+      animation: slideIn 0.3s ease;
+    }
+
+    @keyframes slideIn {
+      from {
+        transform: translateX(400px);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+
+    .loading-spinner {
+      border: 3px solid #f3f4f6;
+      border-top: 3px solid #667eea;
+      border-radius: 50%;
+      width: 24px;
+      height: 24px;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .filter-chip {
+      padding: 8px 16px;
+      border-radius: 20px;
+      border: 2px solid #e5e7eb;
+      background: white;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    .filter-chip:hover {
+      border-color: #667eea;
+      background: #f5f3ff;
+    }
+
+    .filter-chip.active {
+      border-color: #667eea;
+      background: #667eea;
+      color: white;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .project-card {
+      background: white;
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+      transition: all 0.3s ease;
+      border: 2px solid transparent;
+      cursor: pointer;
+    }
+
+    .project-card:hover {
+      border-color: #667eea;
+      box-shadow: 0 4px 16px rgba(102, 126, 234, 0.2);
+    }
+
+    .feature-card {
+      background: white;
+      border-radius: 16px;
+      padding: 32px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+      transition: all 0.3s ease;
+      border: 2px solid transparent;
+    }
+
+    .feature-card:hover {
+      border-color: #667eea;
+      transform: translateY(-8px);
+      box-shadow: 0 12px 32px rgba(102, 126, 234, 0.2);
+    }
+
+    .pricing-card {
+      background: white;
+      border-radius: 24px;
+      padding: 40px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+      transition: all 0.3s ease;
+      border: 3px solid transparent;
+    }
+
+    .pricing-card:hover {
+      border-color: #667eea;
+      transform: translateY(-8px);
+      box-shadow: 0 12px 32px rgba(102, 126, 234, 0.2);
+    }
+
+    .pricing-card.featured {
+      border-color: #667eea;
+      background: linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%);
+    }
+
+    .step-number {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      font-weight: bold;
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+    }
+
+    .hero-section {
+      min-height: 600px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-section::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: url('data:image/svg+xml,<svg width="100" height="100" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="50" r="2" fill="white" opacity="0.1"/></svg>');
+      background-size: 50px 50px;
+    }
+
+    .dropzone {
+      border: 3px dashed #cbd5e1;
+      border-radius: 12px;
+      padding: 40px;
+      text-align: center;
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+
+    .dropzone:hover {
+      border-color: #667eea;
+      background: #f5f3ff;
+    }
+
+    .dropzone.dragover {
+      border-color: #667eea;
+      background: #ede9fe;
+    }
+
+    .timeline-line {
+      position: absolute;
+      left: 30px;
+      top: 80px;
+      bottom: 0;
+      width: 3px;
+      background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
+    }
+
+    .tagline-badge {
+      display: inline-block;
+      padding: 10px 24px;
+      background: rgba(255, 255, 255, 0.2);
+      backdrop-filter: blur(10px);
+      border-radius: 50px;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      animation: fadeInDown 0.8s ease;
+    }
+
+    @keyframes fadeInDown {
+      from {
+        opacity: 0;
+        transform: translateY(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+  </style>
+  <style>@view-transition { navigation: auto; }</style>
+ </head>
+ <body class="bg-slate-50"><!-- Home/Landing Page -->
+  <div id="homePage"><!-- Navigation -->
+   <nav class="bg-white shadow-md sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-6 py-4">
+     <div class="flex items-center justify-between">
+      <div class="flex items-center gap-3">
+       <div class="w-12 h-12 gradient-bg rounded-xl flex items-center justify-center text-2xl">
+        🛡️
+       </div>
+       <div>
+        <h1 id="navPlatformName" class="text-xl font-bold gradient-text">Infrys OpenLens</h1>
+        <p id="navTagline" class="text-xs text-slate-600">Software Inventory &amp; Compliance Platform</p>
+       </div>
+      </div>
+      <div class="flex items-center gap-4"><a href="#features" class="text-slate-700 hover:text-purple-600 font-semibold transition">Features</a> <a href="#how-it-works" class="text-slate-700 hover:text-purple-600 font-semibold transition">How It Works</a> <a href="#pricing" class="text-slate-700 hover:text-purple-600 font-semibold transition">Pricing</a> <button onclick="showLoginModal()" class="px-6 py-2 gradient-bg text-white rounded-lg hover:opacity-90 transition font-semibold shadow-lg"> Sign In </button>
+      </div>
+     </div>
+    </div>
+   </nav><!-- Hero Section -->
+   <section class="hero-section relative">
+    <div class="max-w-7xl mx-auto px-6 py-20 relative z-10">
+     <div class="text-center text-white mb-12">
+      <div class="tagline-badge mb-6">
+       <p class="text-sm font-bold text-white flex items-center gap-2 justify-center"><span class="text-lg">🛡️</span> Enterprise-Grade Software Compliance Platform</p>
+      </div>
+      <h1 id="heroTitle" class="text-6xl font-bold mb-6">Secure Your Software Supply Chain</h1>
+      <p id="heroSubtitle" class="text-2xl mb-8 text-purple-100">Manage, track, and approve software libraries with confidence</p>
+      <div class="flex gap-4 justify-center"><button onclick="showLoginModal()" class="px-8 py-4 bg-white text-purple-600 rounded-lg hover:bg-purple-50 transition font-bold text-lg shadow-2xl"> Get Started Free </button> <button onclick="scrollToSection('how-it-works')" class="px-8 py-4 bg-white bg-opacity-20 text-white rounded-lg hover:bg-opacity-30 transition font-bold text-lg"> See How It Works </button>
+      </div>
+     </div><!-- Hero Stats -->
+     <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mt-16">
+      <div class="bg-white bg-opacity-10 backdrop-blur-lg rounded-2xl p-6 text-center">
+       <div class="text-4xl font-bold text-white mb-2">
+        10K+
+       </div>
+       <div class="text-purple-200">
+        Libraries Tracked
+       </div>
+      </div>
+      <div class="bg-white bg-opacity-10 backdrop-blur-lg rounded-2xl p-6 text-center">
+       <div class="text-4xl font-bold text-white mb-2">
+        500+
+       </div>
+       <div class="text-purple-200">
+        Organizations
+       </div>
+      </div>
+      <div class="bg-white bg-opacity-10 backdrop-blur-lg rounded-2xl p-6 text-center">
+       <div class="text-4xl font-bold text-white mb-2">
+        99.9%
+       </div>
+       <div class="text-purple-200">
+        Uptime
+       </div>
+      </div>
+      <div class="bg-white bg-opacity-10 backdrop-blur-lg rounded-2xl p-6 text-center">
+       <div class="text-4xl font-bold text-white mb-2">
+        24/7
+       </div>
+       <div class="text-purple-200">
+        Support
+       </div>
+      </div>
+     </div>
+    </div>
+   </section><!-- Features Section -->
+   <section id="features" class="py-20 bg-white">
+    <div class="max-w-7xl mx-auto px-6">
+     <div class="text-center mb-16">
+      <h2 class="text-5xl font-bold text-slate-800 mb-4">Powerful Features</h2>
+      <p class="text-xl text-slate-600">Everything you need to manage your software inventory</p>
+     </div>
+     <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+      <div class="feature-card">
+       <div class="w-16 h-16 gradient-bg rounded-2xl flex items-center justify-center text-3xl mb-6">
+        📊
+       </div>
+       <h3 class="text-2xl font-bold text-slate-800 mb-3">Import Inventory</h3>
+       <p class="text-slate-600 mb-4">Upload spreadsheets with your existing software inventory. Support for CSV and Excel formats.</p>
+       <ul class="space-y-2 text-sm text-slate-600">
+        <li>✓ Bulk import from CSV/Excel</li>
+        <li>✓ Automatic data validation</li>
+        <li>✓ Duplicate detection</li>
+       </ul>
+      </div>
+      <div class="feature-card">
+       <div class="w-16 h-16 gradient-bg rounded-2xl flex items-center justify-center text-3xl mb-6">
+        🔍
+       </div>
+       <h3 class="text-2xl font-bold text-slate-800 mb-3">System Scanning</h3>
+       <p class="text-slate-600 mb-4">Scan your systems to detect installed libraries and check for vulnerabilities.</p>
+       <ul class="space-y-2 text-sm text-slate-600">
+        <li>✓ Version comparison</li>
+        <li>✓ CVE vulnerability detection</li>
+        <li>✓ License compliance check</li>
+       </ul>
+      </div>
+      <div class="feature-card">
+       <div class="w-16 h-16 gradient-bg rounded-2xl flex items-center justify-center text-3xl mb-6">
+        ⚖️
+       </div>
+       <h3 class="text-2xl font-bold text-slate-800 mb-3">Approval Workflow</h3>
+       <p class="text-slate-600 mb-4">Streamlined approval process for Legal and GRC teams to review library requests.</p>
+       <ul class="space-y-2 text-sm text-slate-600">
+        <li>✓ Role-based access control</li>
+        <li>✓ Approval tracking</li>
+        <li>✓ Audit trail</li>
+       </ul>
+      </div>
+      <div class="feature-card">
+       <div class="w-16 h-16 gradient-bg rounded-2xl flex items-center justify-center text-3xl mb-6">
+        📁
+       </div>
+       <h3 class="text-2xl font-bold text-slate-800 mb-3">Project Management</h3>
+       <p class="text-slate-600 mb-4">Organize libraries by projects for better team collaboration and tracking.</p>
+       <ul class="space-y-2 text-sm text-slate-600">
+        <li>✓ Multi-project support</li>
+        <li>✓ Team collaboration</li>
+        <li>✓ Project-level reporting</li>
+       </ul>
+      </div>
+      <div class="feature-card">
+       <div class="w-16 h-16 gradient-bg rounded-2xl flex items-center justify-center text-3xl mb-6">
+        🔎
+       </div>
+       <h3 class="text-2xl font-bold text-slate-800 mb-3">Library Search</h3>
+       <p class="text-slate-600 mb-4">Search for approved libraries and request new ones with justification.</p>
+       <ul class="space-y-2 text-sm text-slate-600">
+        <li>✓ Advanced search filters</li>
+        <li>✓ Status tracking</li>
+        <li>✓ Quick approval requests</li>
+       </ul>
+      </div>
+      <div class="feature-card">
+       <div class="w-16 h-16 gradient-bg rounded-2xl flex items-center justify-center text-3xl mb-6">
+        📈
+       </div>
+       <h3 class="text-2xl font-bold text-slate-800 mb-3">Analytics &amp; Reports</h3>
+       <p class="text-slate-600 mb-4">Comprehensive dashboards and reports for compliance and security insights.</p>
+       <ul class="space-y-2 text-sm text-slate-600">
+        <li>✓ Real-time dashboards</li>
+        <li>✓ Vulnerability reports</li>
+        <li>✓ Compliance tracking</li>
+       </ul>
+      </div>
+     </div>
+    </div>
+   </section><!-- How It Works Section -->
+   <section id="how-it-works" class="py-20 bg-slate-50">
+    <div class="max-w-7xl mx-auto px-6">
+     <div class="text-center mb-16">
+      <h2 class="text-5xl font-bold text-slate-800 mb-4">How It Works</h2>
+      <p class="text-xl text-slate-600">Simple workflow for developers and compliance teams</p>
+     </div>
+     <div class="grid grid-cols-1 md:grid-cols-2 gap-12 mb-16"><!-- Developer Workflow -->
+      <div class="bg-white rounded-3xl p-8 shadow-xl">
+       <div class="flex items-center gap-3 mb-6">
+        <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-lg flex items-center justify-center text-white text-2xl">
+         👨‍💻
+        </div>
+        <h3 class="text-2xl font-bold text-slate-800">Developer Workflow</h3>
+       </div>
+       <div class="space-y-6 relative">
+        <div class="timeline-line"></div>
+        <div class="flex gap-4 relative z-10">
+         <div class="step-number">
+          1
+         </div>
+         <div class="flex-1">
+          <h4 class="text-lg font-bold text-slate-800 mb-2">Search for Library</h4>
+          <p class="text-slate-600">Search the inventory to check if a library is already approved for use.</p>
+         </div>
+        </div>
+        <div class="flex gap-4 relative z-10">
+         <div class="step-number">
+          2
+         </div>
+         <div class="flex-1">
+          <h4 class="text-lg font-bold text-slate-800 mb-2">Check Status</h4>
+          <p class="text-slate-600">If approved, use it immediately. If not found, proceed to request approval.</p>
+         </div>
+        </div>
+        <div class="flex gap-4 relative z-10">
+         <div class="step-number">
+          3
+         </div>
+         <div class="flex-1">
+          <h4 class="text-lg font-bold text-slate-800 mb-2">Request Approval</h4>
+          <p class="text-slate-600">Submit a request with justification for why the library is needed.</p>
+         </div>
+        </div>
+        <div class="flex gap-4 relative z-10">
+         <div class="step-number">
+          4
+         </div>
+         <div class="flex-1">
+          <h4 class="text-lg font-bold text-slate-800 mb-2">Use Approved Library</h4>
+          <p class="text-slate-600">Once approved by Legal/GRC, start using the library in your project.</p>
+         </div>
+        </div>
+       </div>
+      </div><!-- Legal/GRC Workflow -->
+      <div class="bg-white rounded-3xl p-8 shadow-xl">
+       <div class="flex items-center gap-3 mb-6">
+        <div class="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-500 rounded-lg flex items-center justify-center text-white text-2xl">
+         ⚖️
+        </div>
+        <h3 class="text-2xl font-bold text-slate-800">Legal/GRC Workflow</h3>
+       </div>
+       <div class="space-y-6 relative">
+        <div class="timeline-line"></div>
+        <div class="flex gap-4 relative z-10">
+         <div class="step-number">
+          1
+         </div>
+         <div class="flex-1">
+          <h4 class="text-lg font-bold text-slate-800 mb-2">Review Requests</h4>
+          <p class="text-slate-600">Access the approvals dashboard to see all pending library requests.</p>
+         </div>
+        </div>
+        <div class="flex gap-4 relative z-10">
+         <div class="step-number">
+          2
+         </div>
+         <div class="flex-1">
+          <h4 class="text-lg font-bold text-slate-800 mb-2">Check Compliance</h4>
+          <p class="text-slate-600">Review license terms, vulnerabilities, and compliance requirements.</p>
+         </div>
+        </div>
+        <div class="flex gap-4 relative z-10">
+         <div class="step-number">
+          3
+         </div>
+         <div class="flex-1">
+          <h4 class="text-lg font-bold text-slate-800 mb-2">Make Decision</h4>
+          <p class="text-slate-600">Approve or reject the request with notes for the developer.</p>
+         </div>
+        </div>
+        <div class="flex gap-4 relative z-10">
+         <div class="step-number">
+          4
+         </div>
+         <div class="flex-1">
+          <h4 class="text-lg font-bold text-slate-800 mb-2">Track &amp; Audit</h4>
+          <p class="text-slate-600">Monitor approved libraries and maintain compliance audit trails.</p>
+         </div>
+        </div>
+       </div>
+      </div>
+     </div><!-- Additional Features -->
+     <div class="bg-gradient-to-br from-purple-50 to-blue-50 rounded-3xl p-12">
+      <h3 class="text-3xl font-bold text-slate-800 mb-8 text-center">Additional Capabilities</h3>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+       <div class="text-center">
+        <div class="w-20 h-20 bg-white rounded-2xl flex items-center justify-center text-4xl mx-auto mb-4 shadow-lg">
+         📊
+        </div>
+        <h4 class="text-xl font-bold text-slate-800 mb-2">Import Inventory</h4>
+        <p class="text-slate-600">Upload existing inventory via CSV or Excel spreadsheets for bulk processing.</p>
+       </div>
+       <div class="text-center">
+        <div class="w-20 h-20 bg-white rounded-2xl flex items-center justify-center text-4xl mx-auto mb-4 shadow-lg">
+         🔍
+        </div>
+        <h4 class="text-xl font-bold text-slate-800 mb-2">System Scanning</h4>
+        <p class="text-slate-600">Automatically scan systems to detect installed versions and vulnerabilities.</p>
+       </div>
+       <div class="text-center">
+        <div class="w-20 h-20 bg-white rounded-2xl flex items-center justify-center text-4xl mx-auto mb-4 shadow-lg">
+         📁
+        </div>
+        <h4 class="text-xl font-bold text-slate-800 mb-2">Project Organization</h4>
+        <p class="text-slate-600">Create projects to organize libraries and enable team collaboration.</p>
+       </div>
+      </div>
+     </div>
+    </div>
+   </section><!-- Pricing Section -->
+   <section id="pricing" class="py-20 bg-white">
+    <div class="max-w-7xl mx-auto px-6">
+     <div class="text-center mb-16">
+      <h2 class="text-5xl font-bold text-slate-800 mb-4">Simple, Transparent Pricing</h2>
+      <p class="text-xl text-slate-600">Choose the plan that fits your organization</p>
+     </div>
+     <div class="grid grid-cols-1 md:grid-cols-3 gap-8"><!-- Starter Plan -->
+      <div class="pricing-card">
+       <div class="text-center mb-6">
+        <div class="text-5xl mb-4">
+         🚀
+        </div>
+        <h3 class="text-2xl font-bold text-slate-800 mb-2">Starter</h3>
+        <div class="text-4xl font-bold text-slate-800 mb-2">
+         $49<span class="text-lg text-slate-600">/mo</span>
+        </div>
+        <p class="text-slate-600">Perfect for small teams</p>
+       </div>
+       <ul class="space-y-3 mb-8">
+        <li class="flex items-center gap-2 text-slate-700"><span class="text-green-600">✓</span> Up to 100 libraries</li>
+        <li class="flex items-center gap-2 text-slate-700"><span class="text-green-600">✓</span> 3 projects</li>
+        <li class="flex items-center gap-2 text-slate-700"><span class="text-green-600">✓</span> 5 team members</li>
+        <li class="flex items-center gap-2 text-slate-700"><span class="text-green-600">✓</span> Basic vulnerability scanning</li>
+        <li class="flex items-center gap-2 text-slate-700"><span class="text-green-600">✓</span> Email support</li>
+       </ul><button onclick="showLoginModal()" class="w-full py-3 border-2 border-purple-600 text-purple-600 rounded-lg hover:bg-purple-50 transition font-bold"> Get Started </button>
+      </div><!-- Professional Plan (Featured) -->
+      <div class="pricing-card featured">
+       <div class="absolute top-0 right-0 bg-gradient-to-r from-purple-600 to-pink-600 text-white px-4 py-1 rounded-bl-lg rounded-tr-2xl text-sm font-bold">
+        POPULAR
+       </div>
+       <div class="text-center mb-6">
+        <div class="text-5xl mb-4">
+         💼
+        </div>
+        <h3 class="text-2xl font-bold text-slate-800 mb-2">Professional</h3>
+        <div class="text-4xl font-bold text-slate-800 mb-2">
+         $149<span class="text-lg text-slate-600">/mo</span>
+        </div>
+        <p class="text-slate-600">For growing organizations</p>
+       </div>
+       <ul class="space-y-3 mb-8">
+        <li class="flex items-center gap-2 text-slate-700"><span class="text-green-600">✓</span> Up to 500 libraries</li>
+        <li class="flex items-center gap-2 text-slate-700"><span class="text-green-600">✓</span> Unlimited projects</li>
+        <li class="flex items-center gap-2 text-slate-700"><span class="text-green-600">✓</span> 20 team members</li>
+        <li class="flex items-center gap-2 text-slate-700"><span class="text-green-600">✓</span> Advanced vulnerability scanning</li>
+        <li class="flex items-center gap-2 text-slate-700"><span class="text-green-600">✓</span> Priority support</li>
+        <li class="flex items-center gap-2 text-slate-700"><span class="text-green-600">✓</span> API access</li>
+        <li class="flex items-center gap-2 text-slate-700"><span class="text-green-600">✓</span> Custom workflows</li>
+       </ul><button onclick="showLoginModal()" class="w-full py-3 gradient-bg text-white rounded-lg hover:opacity-90 transition font-bold shadow-lg"> Get Started </button>
+      </div><!-- Enterprise Plan -->
+      <div class="pricing-card">
+       <div class="text-center mb-6">
+        <div class="text-5xl mb-4">
+         🏢
+        </div>
+        <h3 class="text-2xl font-bold text-slate-800 mb-2">Enterprise</h3>
+        <div class="text-4xl font-bold text-slate-800 mb-2">
+         Custom
+        </div>
+        <p class="text-slate-600">For large enterprises</p>
+       </div>
+       <ul class="space-y-3 mb-8">
+        <li class="flex items-center gap-2 text-slate-700"><span class="text-green-600">✓</span> Unlimited libraries</li>
+        <li class="flex items-center gap-2 text-slate-700"><span class="text-green-600">✓</span> Unlimited projects</li>
+        <li class="flex items-center gap-2 text-slate-700"><span class="text-green-600">✓</span> Unlimited team members</li>
+        <li class="flex items-center gap-2 text-slate-700"><span class="text-green-600">✓</span> Enterprise-grade security</li>
+        <li class="flex items-center gap-2 text-slate-700"><span class="text-green-600">✓</span> 24/7 dedicated support</li>
+        <li class="flex items-center gap-2 text-slate-700"><span class="text-green-600">✓</span> On-premise deployment</li>
+        <li class="flex items-center gap-2 text-slate-700"><span class="text-green-600">✓</span> Custom integrations</li>
+        <li class="flex items-center gap-2 text-slate-700"><span class="text-green-600">✓</span> SLA guarantee</li>
+       </ul><button onclick="showLoginModal()" class="w-full py-3 border-2 border-purple-600 text-purple-600 rounded-lg hover:bg-purple-50 transition font-bold"> Contact Sales </button>
+      </div>
+     </div>
+     <div class="mt-12 text-center">
+      <p class="text-slate-600 mb-4">All plans include a 14-day free trial. No credit card required.</p>
+      <p class="text-sm text-slate-500">Need a custom plan? <a href="#" onclick="showLoginModal(); return false;" class="text-purple-600 font-semibold hover:underline">Contact us</a> for enterprise pricing.</p>
+     </div>
+    </div>
+   </section><!-- Footer -->
+   <footer class="bg-slate-900 text-white py-12">
+    <div class="max-w-7xl mx-auto px-6">
+     <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+      <div>
+       <div class="flex items-center gap-3 mb-4">
+        <div class="w-10 h-10 gradient-bg rounded-lg flex items-center justify-center text-xl">
+         🛡️
+        </div>
+        <h3 class="text-xl font-bold">Infrys OpenLens</h3>
+       </div>
+       <p class="text-slate-400 text-sm">Secure your software supply chain with confidence.</p>
+      </div>
+      <div>
+       <h4 class="font-bold mb-4">Product</h4>
+       <ul class="space-y-2 text-sm text-slate-400">
+        <li><a href="#features" class="hover:text-white transition">Features</a></li>
+        <li><a href="#how-it-works" class="hover:text-white transition">How It Works</a></li>
+        <li><a href="#pricing" class="hover:text-white transition">Pricing</a></li>
+       </ul>
+      </div>
+      <div>
+       <h4 class="font-bold mb-4">Company</h4>
+       <ul class="space-y-2 text-sm text-slate-400">
+        <li><a href="#" class="hover:text-white transition">About Us</a></li>
+        <li><a href="#" class="hover:text-white transition">Careers</a></li>
+        <li><a href="#" class="hover:text-white transition">Contact</a></li>
+       </ul>
+      </div>
+      <div>
+       <h4 class="font-bold mb-4">Legal</h4>
+       <ul class="space-y-2 text-sm text-slate-400">
+        <li><a href="#" class="hover:text-white transition">Privacy Policy</a></li>
+        <li><a href="#" class="hover:text-white transition">Terms of Service</a></li>
+        <li><a href="#" class="hover:text-white transition">Security</a></li>
+       </ul>
+      </div>
+     </div>
+     <div class="border-t border-slate-800 pt-8 text-center text-sm text-slate-400">
+      <p>© 2024 Infrys OpenLens. All rights reserved.</p>
+     </div>
+    </div>
+   </footer>
+  </div><!-- Login Modal -->
+  <div id="loginModal" class="modal hidden">
+   <div class="modal-content max-w-md">
+    <div class="gradient-bg text-white p-8 text-center rounded-t-3xl">
+     <div class="w-20 h-20 bg-white rounded-3xl flex items-center justify-center text-5xl mx-auto mb-4 shadow-2xl">
+      🛡️
+     </div>
+     <h1 class="text-3xl font-bold mb-2">Welcome Back</h1>
+     <p class="text-purple-200">Sign in to access your dashboard</p>
+    </div>
+    <div class="p-8">
+     <h2 class="text-2xl font-bold text-slate-800 mb-6 text-center">Select Your Role</h2>
+     <div class="space-y-3 mb-6">
+      <div class="p-4 border-3 border-transparent rounded-xl bg-blue-50 hover:border-blue-500 transition cursor-pointer role-selector" data-role="developer">
+       <div class="flex items-center gap-3">
+        <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-lg flex items-center justify-center text-white text-2xl">
+         👨‍💻
+        </div>
+        <div>
+         <h3 class="font-bold text-slate-800">Developer</h3>
+         <p class="text-sm text-slate-600">Search &amp; request libraries</p>
+        </div>
+       </div>
+      </div>
+      <div class="p-4 border-3 border-transparent rounded-xl bg-purple-50 hover:border-purple-500 transition cursor-pointer role-selector" data-role="legal">
+       <div class="flex items-center gap-3">
+        <div class="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-500 rounded-lg flex items-center justify-center text-white text-2xl">
+         ⚖️
+        </div>
+        <div>
+         <h3 class="font-bold text-slate-800">Legal/GRC Team</h3>
+         <p class="text-sm text-slate-600">Review &amp; approve licenses</p>
+        </div>
+       </div>
+      </div>
+      <div class="p-4 border-3 border-transparent rounded-xl bg-orange-50 hover:border-orange-500 transition cursor-pointer role-selector" data-role="admin">
+       <div class="flex items-center gap-3">
+        <div class="w-12 h-12 bg-gradient-to-br from-orange-500 to-red-500 rounded-lg flex items-center justify-center text-white text-2xl">
+         👑
+        </div>
+        <div>
+         <h3 class="font-bold text-slate-800">Administrator</h3>
+         <p class="text-sm text-slate-600">Full system access</p>
+        </div>
+       </div>
+      </div>
+     </div>
+     <form id="loginForm" class="space-y-4">
+      <div><label for="username" class="block text-sm font-semibold text-slate-700 mb-2">Username</label> <input type="text" id="username" required class="w-full px-4 py-3 border-2 border-slate-200 rounded-lg focus:border-purple-500 focus:outline-none transition">
+      </div>
+      <div><label for="password" class="block text-sm font-semibold text-slate-700 mb-2">Password</label> <input type="password" id="password" required class="w-full px-4 py-3 border-2 border-slate-200 rounded-lg focus:border-purple-500 focus:outline-none transition">
+      </div><button type="submit" class="w-full gradient-bg text-white py-3 rounded-lg font-bold text-lg hover:opacity-90 transition shadow-lg"> Sign In </button>
+     </form>
+     <div class="mt-6 bg-slate-50 rounded-lg p-4 border-2 border-slate-200">
+      <p class="text-xs font-bold text-slate-700 mb-2 text-center">Demo Credentials:</p>
+      <div class="grid grid-cols-3 gap-2 text-xs">
+       <div class="text-center">
+        <p class="font-semibold text-blue-700">👨‍💻 Dev</p>
+        <p class="text-slate-600">dev/dev123</p>
+       </div>
+       <div class="text-center">
+        <p class="font-semibold text-purple-700">⚖️ Legal</p>
+        <p class="text-slate-600">legal/legal123</p>
+       </div>
+       <div class="text-center">
+        <p class="font-semibold text-orange-700">👑 Admin</p>
+        <p class="text-slate-600">admin/admin123</p>
+       </div>
+      </div>
+     </div><button onclick="closeLoginModal()" class="w-full mt-4 px-6 py-3 bg-slate-200 text-slate-800 rounded-lg font-semibold hover:bg-slate-300 transition"> Cancel </button>
+    </div>
+   </div>
+  </div><!-- Main Application -->
+  <div id="mainApp" class="hidden min-h-full flex flex-col"><!-- Navigation Bar -->
+   <nav class="gradient-bg text-white shadow-lg">
+    <div class="max-w-7xl mx-auto px-6 py-4">
+     <div class="flex items-center justify-between">
+      <div class="flex items-center gap-4">
+       <div class="w-12 h-12 bg-white rounded-xl flex items-center justify-center text-2xl">
+        🛡️
+       </div>
+       <div>
+        <h1 id="appPlatformName" class="text-xl font-bold">Infrys OpenLens</h1>
+        <p id="appTagline" class="text-xs text-purple-200">Software Inventory &amp; Compliance Platform</p>
+       </div>
+      </div>
+      <div class="flex items-center gap-2">
+       <div class="nav-link active" data-section="dashboard">
+        Dashboard
+       </div>
+       <div class="nav-link" data-section="inventory">
+        Inventory
+       </div>
+       <div class="nav-link" data-section="projects">
+        Projects
+       </div>
+       <div class="nav-link" data-section="approvals" id="approvalsNav">
+        Approvals
+       </div>
+      </div>
+      <div class="flex items-center gap-4">
+       <div id="userRoleBadge" class="role-badge"></div><button onclick="logout()" class="px-4 py-2 bg-white bg-opacity-20 rounded-lg hover:bg-opacity-30 transition"> Logout </button>
+      </div>
+     </div>
+    </div>
+   </nav><!-- Dashboard Section -->
+   <div id="dashboardSection" class="flex-1 max-w-7xl mx-auto px-6 py-8 w-full">
+    <div class="mb-8">
+     <h2 class="text-3xl font-bold text-slate-800 mb-2">Dashboard</h2>
+     <p class="text-slate-600">Welcome back, <span id="dashboardUsername"></span>!</p>
+    </div><!-- Stats Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+     <div class="stat-card border-l-4 border-blue-500">
+      <div class="text-3xl mb-2">
+       📦
+      </div>
+      <div id="totalLibrariesStat" class="text-3xl font-bold text-slate-800 mb-1">
+       0
+      </div>
+      <div class="text-sm text-slate-600">
+       Total Libraries
+      </div>
+     </div>
+     <div class="stat-card border-l-4 border-green-500">
+      <div class="text-3xl mb-2">
+       ✅
+      </div>
+      <div id="approvedStat" class="text-3xl font-bold text-slate-800 mb-1">
+       0
+      </div>
+      <div class="text-sm text-slate-600">
+       Approved
+      </div>
+     </div>
+     <div class="stat-card border-l-4 border-orange-500">
+      <div class="text-3xl mb-2">
+       ⏳
+      </div>
+      <div id="pendingStat" class="text-3xl font-bold text-slate-800 mb-1">
+       0
+      </div>
+      <div class="text-sm text-slate-600">
+       Pending Approval
+      </div>
+     </div>
+     <div class="stat-card border-l-4 border-red-500">
+      <div class="text-3xl mb-2">
+       ⚠️
+      </div>
+      <div id="vulnerabilitiesStat" class="text-3xl font-bold text-slate-800 mb-1">
+       0
+      </div>
+      <div class="text-sm text-slate-600">
+       Vulnerabilities
+      </div>
+     </div>
+    </div><!-- Quick Actions -->
+    <div class="bg-white rounded-2xl shadow-lg p-6 mb-8">
+     <h3 class="text-xl font-bold text-slate-800 mb-4">Quick Actions</h3>
+     <div class="grid grid-cols-1 md:grid-cols-4 gap-4"><button onclick="showSection('inventory'); openImportModal();" class="flex items-center gap-3 p-4 bg-blue-50 rounded-lg hover:bg-blue-100 transition border-2 border-blue-200">
+       <div class="w-12 h-12 bg-blue-600 rounded-lg flex items-center justify-center text-white text-2xl">
+        📊
+       </div>
+       <div class="text-left">
+        <p class="font-bold text-slate-800">Import Inventory</p>
+        <p class="text-sm text-slate-600">Upload spreadsheet</p>
+       </div></button> <button onclick="showSection('inventory'); openScanModal();" class="flex items-center gap-3 p-4 bg-purple-50 rounded-lg hover:bg-purple-100 transition border-2 border-purple-200">
+       <div class="w-12 h-12 bg-purple-600 rounded-lg flex items-center justify-center text-white text-2xl">
+        🔍
+       </div>
+       <div class="text-left">
+        <p class="font-bold text-slate-800">Scan System</p>
+        <p class="text-sm text-slate-600">Check versions</p>
+       </div></button> <button onclick="showSection('inventory'); openSearchModal();" class="flex items-center gap-3 p-4 bg-green-50 rounded-lg hover:bg-green-100 transition border-2 border-green-200">
+       <div class="w-12 h-12 bg-green-600 rounded-lg flex items-center justify-center text-white text-2xl">
+        🔎
+       </div>
+       <div class="text-left">
+        <p class="font-bold text-slate-800">Search Library</p>
+        <p class="text-sm text-slate-600">Find approved libs</p>
+       </div></button> <button onclick="showSection('projects'); openCreateProjectModal();" class="flex items-center gap-3 p-4 bg-orange-50 rounded-lg hover:bg-orange-100 transition border-2 border-orange-200">
+       <div class="w-12 h-12 bg-orange-600 rounded-lg flex items-center justify-center text-white text-2xl">
+        📁
+       </div>
+       <div class="text-left">
+        <p class="font-bold text-slate-800">New Project</p>
+        <p class="text-sm text-slate-600">Create project</p>
+       </div></button>
+     </div>
+    </div><!-- Recent Activity -->
+    <div class="bg-white rounded-2xl shadow-lg p-6">
+     <h3 class="text-xl font-bold text-slate-800 mb-4">Recent Activity</h3>
+     <div id="recentActivityList" class="space-y-3">
+      <div class="text-center py-8 text-slate-500">
+       <div class="text-4xl mb-2">
+        📋
+       </div>
+       <p class="text-sm">No recent activity</p>
+      </div>
+     </div>
+    </div>
+   </div><!-- Inventory Section -->
+   <div id="inventorySection" class="hidden flex-1 max-w-7xl mx-auto px-6 py-8 w-full">
+    <div class="mb-8">
+     <div class="flex items-center justify-between mb-4">
+      <div>
+       <h2 class="text-3xl font-bold text-slate-800 mb-2">Software Inventory</h2>
+       <p class="text-slate-600">Manage your software libraries and dependencies</p>
+      </div>
+      <div class="flex gap-3"><button onclick="openImportModal()" class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-semibold shadow-lg flex items-center gap-2"> <span class="text-xl">📊</span> Import </button> <button onclick="openScanModal()" class="px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition font-semibold shadow-lg flex items-center gap-2"> <span class="text-xl">🔍</span> Scan </button> <button onclick="openSearchModal()" class="px-6 py-3 gradient-bg text-white rounded-lg hover:opacity-90 transition font-semibold shadow-lg flex items-center gap-2"> <span class="text-xl">🔎</span> Search </button>
+      </div>
+     </div><!-- Filters -->
+     <div class="bg-white rounded-2xl shadow-lg p-6 mb-6">
+      <div class="flex flex-col md:flex-row gap-4 mb-4">
+       <div class="flex-1"><input type="text" id="inventorySearchInput" placeholder="Search by name, version, or license..." class="w-full px-4 py-3 border-2 border-slate-200 rounded-lg focus:border-purple-500 focus:outline-none transition">
+       </div><select id="projectFilter" class="px-4 py-3 border-2 border-slate-200 rounded-lg focus:border-purple-500 focus:outline-none transition"> <option value="all">All Projects</option> </select>
+      </div>
+      <div class="flex flex-wrap gap-2"><button onclick="filterInventory('all')" class="filter-chip active" data-filter="all">All</button> <button onclick="filterInventory('approved')" class="filter-chip" data-filter="approved">✅ Approved</button> <button onclick="filterInventory('pending')" class="filter-chip" data-filter="pending">⏳ Pending</button> <button onclick="filterInventory('rejected')" class="filter-chip" data-filter="rejected">❌ Rejected</button> <button onclick="filterInventory('vulnerable')" class="filter-chip" data-filter="vulnerable">⚠️ Vulnerable</button> <button onclick="filterInventory('outdated')" class="filter-chip" data-filter="outdated">🔄 Outdated</button>
+      </div>
+     </div>
+    </div><!-- Inventory Grid -->
+    <div id="inventoryGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+     <div class="col-span-full text-center py-12 text-slate-500">
+      <div class="text-6xl mb-4">
+       📦
+      </div>
+      <p class="text-lg font-semibold mb-2">No libraries in inventory</p>
+      <p class="text-sm mb-4">Import a spreadsheet, scan your system, or search for libraries</p>
+     </div>
+    </div>
+   </div><!-- Projects Section -->
+   <div id="projectsSection" class="hidden flex-1 max-w-7xl mx-auto px-6 py-8 w-full">
+    <div class="mb-8">
+     <div class="flex items-center justify-between mb-4">
+      <div>
+       <h2 class="text-3xl font-bold text-slate-800 mb-2">Projects</h2>
+       <p class="text-slate-600">Organize libraries by project for team collaboration</p>
+      </div><button onclick="openCreateProjectModal()" class="px-6 py-3 gradient-bg text-white rounded-lg hover:opacity-90 transition font-semibold shadow-lg flex items-center gap-2"> <span class="text-xl">➕</span> Create Project </button>
+     </div>
+    </div><!-- Projects Grid -->
+    <div id="projectsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+     <div class="col-span-full text-center py-12 text-slate-500">
+      <div class="text-6xl mb-4">
+       📁
+      </div>
+      <p class="text-lg font-semibold mb-2">No projects yet</p>
+      <p class="text-sm mb-4">Create your first project to organize libraries</p><button onclick="openCreateProjectModal()" class="px-6 py-3 gradient-bg text-white rounded-lg hover:opacity-90 transition font-semibold"> Create Project </button>
+     </div>
+    </div>
+   </div><!-- Approvals Section -->
+   <div id="approvalsSection" class="hidden flex-1 max-w-7xl mx-auto px-6 py-8 w-full">
+    <div class="mb-8">
+     <h2 class="text-3xl font-bold text-slate-800 mb-2">Pending Approvals</h2>
+     <p class="text-slate-600">Review and approve library requests from developers</p>
+    </div><!-- Approvals Grid -->
+    <div id="approvalsGrid" class="space-y-4">
+     <div class="text-center py-12 text-slate-500">
+      <div class="text-6xl mb-4">
+       ✅
+      </div>
+      <p class="text-lg font-semibold mb-2">No pending approvals</p>
+      <p class="text-sm">All library requests have been reviewed</p>
+     </div>
+    </div>
+   </div>
+  </div><!-- Import Modal -->
+  <div id="importModal" class="modal hidden">
+   <div class="modal-content">
+    <div class="p-6 border-b-2 border-slate-200">
+     <div class="flex items-center justify-between">
+      <h3 class="text-2xl font-bold text-slate-800">Import Inventory</h3><button onclick="closeImportModal()" class="text-slate-400 hover:text-slate-600 text-2xl">✕</button>
+     </div>
+    </div>
+    <div class="p-6">
+     <div class="mb-6"><label class="block text-sm font-semibold text-slate-700 mb-2">Select Project</label> <select id="importProjectSelect" class="w-full px-4 py-3 border-2 border-slate-200 rounded-lg focus:border-purple-500 focus:outline-none transition"> <option value="">Select a project</option> </select>
+     </div>
+     <div class="dropzone mb-6" id="dropzone">
+      <div class="text-5xl mb-3">
+       📊
+      </div>
+      <p class="text-lg font-bold text-slate-800 mb-2">Drop your spreadsheet here</p>
+      <p class="text-sm text-slate-600 mb-4">or click to browse</p><input type="file" id="fileInput" accept=".csv,.xlsx,.xls" class="hidden"> <button onclick="document.getElementById('fileInput').click()" class="px-6 py-3 gradient-bg text-white rounded-lg hover:opacity-90 transition font-semibold"> Choose File </button>
+      <p class="text-xs text-slate-500 mt-4">Supported formats: CSV, Excel (.xlsx, .xls)</p>
+     </div>
+     <div class="bg-blue-50 border-2 border-blue-200 rounded-lg p-4 mb-6">
+      <h4 class="font-bold text-blue-800 mb-2">📋 Expected Format:</h4>
+      <p class="text-sm text-blue-700 mb-2">Your spreadsheet should have these columns:</p><code class="text-xs bg-white px-2 py-1 rounded block">Name, Version, License, Category</code>
+     </div>
+     <div id="importPreview" class="hidden mb-6">
+      <h4 class="font-bold text-slate-800 mb-3">Preview (first 5 rows):</h4>
+      <div class="overflow-x-auto">
+       <table class="w-full text-sm">
+        <thead class="bg-slate-100">
+         <tr>
+          <th class="px-4 py-2 text-left">Name</th>
+          <th class="px-4 py-2 text-left">Version</th>
+          <th class="px-4 py-2 text-left">License</th>
+          <th class="px-4 py-2 text-left">Category</th>
+         </tr>
+        </thead>
+        <tbody id="importPreviewBody"></tbody>
+       </table>
+      </div>
+     </div>
+     <div class="flex gap-3"><button id="importButton" onclick="processImport()" disabled class="flex-1 gradient-bg text-white py-3 rounded-lg font-bold hover:opacity-90 transition shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"> Import Libraries </button> <button onclick="closeImportModal()" class="px-6 py-3 bg-slate-200 text-slate-800 rounded-lg font-semibold hover:bg-slate-300 transition"> Cancel </button>
+     </div>
+    </div>
+   </div>
+  </div><!-- Scan Modal -->
+  <div id="scanModal" class="modal hidden">
+   <div class="modal-content">
+    <div class="p-6 border-b-2 border-slate-200">
+     <div class="flex items-center justify-between">
+      <h3 class="text-2xl font-bold text-slate-800">Scan System</h3><button onclick="closeScanModal()" class="text-slate-400 hover:text-slate-600 text-2xl">✕</button>
+     </div>
+    </div>
+    <div class="p-6">
+     <div class="mb-6"><label class="block text-sm font-semibold text-slate-700 mb-2">Select Project</label> <select id="scanProjectSelect" class="w-full px-4 py-3 border-2 border-slate-200 rounded-lg focus:border-purple-500 focus:outline-none transition"> <option value="">Select a project</option> </select>
+     </div>
+     <div class="bg-purple-50 border-2 border-purple-200 rounded-lg p-6 text-center mb-6">
+      <div class="text-5xl mb-3">
+       🔍
+      </div>
+      <h4 class="text-lg font-bold text-slate-800 mb-2">System Scan</h4>
+      <p class="text-sm text-slate-600 mb-4">Scan your system for installed libraries and check for:</p>
+      <ul class="text-sm text-slate-700 text-left max-w-md mx-auto space-y-2">
+       <li>✓ Installed version vs latest available version</li>
+       <li>✓ Known vulnerabilities (CVE database)</li>
+       <li>✓ License compliance issues</li>
+       <li>✓ Outdated dependencies</li>
+      </ul>
+     </div>
+     <div id="scanResults" class="hidden mb-6">
+      <h4 class="font-bold text-slate-800 mb-3">Scan Results:</h4>
+      <div id="scanResultsList" class="space-y-2 max-h-64 overflow-y-auto"></div>
+     </div>
+     <div class="flex gap-3"><button id="scanButton" onclick="performScan()" class="flex-1 bg-purple-600 text-white py-3 rounded-lg font-bold hover:bg-purple-700 transition shadow-lg"> Start Scan </button> <button onclick="closeScanModal()" class="px-6 py-3 bg-slate-200 text-slate-800 rounded-lg font-semibold hover:bg-slate-300 transition"> Cancel </button>
+     </div>
+    </div>
+   </div>
+  </div><!-- Search Modal -->
+  <div id="searchModal" class="modal hidden">
+   <div class="modal-content">
+    <div class="p-6 border-b-2 border-slate-200">
+     <div class="flex items-center justify-between">
+      <h3 class="text-2xl font-bold text-slate-800">Search Library</h3><button onclick="closeSearchModal()" class="text-slate-400 hover:text-slate-600 text-2xl">✕</button>
+     </div>
+    </div>
+    <div class="p-6">
+     <div class="mb-6"><label class="block text-sm font-semibold text-slate-700 mb-2">Library Name</label> <input type="text" id="searchLibraryInput" placeholder="e.g., React, Express, Django..." class="w-full px-4 py-3 border-2 border-slate-200 rounded-lg focus:border-purple-500 focus:outline-none transition">
+     </div>
+     <div id="searchResults" class="mb-6">
+      <div class="text-center py-8 text-slate-500">
+       <div class="text-4xl mb-2">
+        🔎
+       </div>
+       <p class="text-sm">Enter a library name to search</p>
+      </div>
+     </div><button onclick="closeSearchModal()" class="w-full px-6 py-3 bg-slate-200 text-slate-800 rounded-lg font-semibold hover:bg-slate-300 transition"> Close </button>
+    </div>
+   </div>
+  </div><!-- Library Details Modal -->
+  <div id="libraryDetailsModal" class="modal hidden">
+   <div class="modal-content">
+    <div class="p-6 border-b-2 border-slate-200">
+     <div class="flex items-center justify-between">
+      <h3 class="text-2xl font-bold text-slate-800">Library Details</h3><button onclick="closeLibraryDetailsModal()" class="text-slate-400 hover:text-slate-600 text-2xl">✕</button>
+     </div>
+    </div>
+    <div id="libraryDetailsContent" class="p-6"></div>
+   </div>
+  </div><!-- Create Project Modal -->
+  <div id="createProjectModal" class="modal hidden">
+   <div class="modal-content">
+    <div class="p-6 border-b-2 border-slate-200">
+     <div class="flex items-center justify-between">
+      <h3 class="text-2xl font-bold text-slate-800">Create New Project</h3><button onclick="closeCreateProjectModal()" class="text-slate-400 hover:text-slate-600 text-2xl">✕</button>
+     </div>
+    </div>
+    <form id="createProjectForm" class="p-6 space-y-4">
+     <div><label for="projectName" class="block text-sm font-semibold text-slate-700 mb-2">Project Name *</label> <input type="text" id="projectName" required class="w-full px-4 py-3 border-2 border-slate-200 rounded-lg focus:border-purple-500 focus:outline-none transition" placeholder="e.g., Mobile App, Web Platform">
+     </div>
+     <div><label for="projectDescription" class="block text-sm font-semibold text-slate-700 mb-2">Description</label> <textarea id="projectDescription" rows="3" class="w-full px-4 py-3 border-2 border-slate-200 rounded-lg focus:border-purple-500 focus:outline-none transition" placeholder="Brief description of the project..."></textarea>
+     </div>
+     <div class="flex gap-3 pt-4"><button type="submit" id="createProjectButton" class="flex-1 gradient-bg text-white py-3 rounded-lg font-bold hover:opacity-90 transition shadow-lg"> Create Project </button> <button type="button" onclick="closeCreateProjectModal()" class="px-6 py-3 bg-slate-200 text-slate-800 rounded-lg font-semibold hover:bg-slate-300 transition"> Cancel </button>
+     </div>
+    </form>
+   </div>
+  </div><!-- Request Approval Modal -->
+  <div id="requestApprovalModal" class="modal hidden">
+   <div class="modal-content">
+    <div class="p-6 border-b-2 border-slate-200">
+     <div class="flex items-center justify-between">
+      <h3 class="text-2xl font-bold text-slate-800">Request Approval</h3><button onclick="closeRequestApprovalModal()" class="text-slate-400 hover:text-slate-600 text-2xl">✕</button>
+     </div>
+    </div>
+    <div class="p-6">
+     <div class="bg-orange-50 border-2 border-orange-200 rounded-lg p-4 mb-6">
+      <div class="flex items-start gap-3"><span class="text-2xl">⚠️</span>
+       <div>
+        <h4 class="font-bold text-orange-800 mb-1">Approval Required</h4>
+        <p class="text-sm text-orange-700">This library is not yet approved. Submit a request to the Legal/GRC team for review.</p>
+       </div>
+      </div>
+     </div>
+     <div id="requestApprovalLibraryInfo" class="mb-6"></div>
+     <div class="mb-6"><label for="requestNotes" class="block text-sm font-semibold text-slate-700 mb-2">Justification / Notes</label> <textarea id="requestNotes" rows="4" class="w-full px-4 py-3 border-2 border-slate-200 rounded-lg focus:border-purple-500 focus:outline-none transition" placeholder="Explain why this library is needed for your project..."></textarea>
+     </div>
+     <div class="flex gap-3"><button id="submitApprovalRequestButton" onclick="submitApprovalRequest()" class="flex-1 gradient-bg text-white py-3 rounded-lg font-bold hover:opacity-90 transition shadow-lg"> Submit Request </button> <button onclick="closeRequestApprovalModal()" class="px-6 py-3 bg-slate-200 text-slate-800 rounded-lg font-semibold hover:bg-slate-300 transition"> Cancel </button>
+     </div>
+    </div>
+   </div>
+  </div>
+  <script>
+    // Global state
+    let currentUser = null;
+    let selectedRole = null;
+    let allLibraries = [];
+    let allProjects = new Set();
+    let currentFilter = 'all';
+    let currentSearchTerm = '';
+    let currentProjectFilter = 'all';
+    let importedData = [];
+    let selectedLibraryForApproval = null;
+    let sampleDataLoaded = false;
+
+    // Default config for Element SDK
+    const defaultConfig = {
+      platform_name: 'Infrys OpenLens',
+      tagline: 'Software Inventory & Compliance Platform',
+      hero_title: 'Secure Your Software Supply Chain',
+      hero_subtitle: 'Manage, track, and approve software libraries with confidence'
+    };
+
+    // Data SDK Handler
+    const dataHandler = {
+      onDataChanged(data) {
+        allLibraries = data;
+        
+        // Extract unique projects
+        allProjects = new Set(data.filter(lib => lib.type === 'project').map(lib => lib.projectName).filter(Boolean));
+        
+        updateDashboardStats();
+        renderInventory();
+        renderProjects();
+        renderApprovals();
+        updateProjectFilters();
+      }
+    };
+
+    // Element SDK Implementation
+    const element = {
+      defaultConfig: defaultConfig,
+      onConfigChange: async (config) => {
+        const platformName = config.platform_name || defaultConfig.platform_name;
+        const tagline = config.tagline || defaultConfig.tagline;
+        const heroTitle = config.hero_title || defaultConfig.hero_title;
+        const heroSubtitle = config.hero_subtitle || defaultConfig.hero_subtitle;
+
+        const navPlatformName = document.getElementById('navPlatformName');
+        if (navPlatformName) navPlatformName.textContent = platformName;
+        
+        const navTagline = document.getElementById('navTagline');
+        if (navTagline) navTagline.textContent = tagline;
+
+        const appPlatformName = document.getElementById('appPlatformName');
+        if (appPlatformName) appPlatformName.textContent = platformName;
+
+        const appTagline = document.getElementById('appTagline');
+        if (appTagline) appTagline.textContent = tagline;
+
+        const heroTitleEl = document.getElementById('heroTitle');
+        if (heroTitleEl) heroTitleEl.textContent = heroTitle;
+
+        const heroSubtitleEl = document.getElementById('heroSubtitle');
+        if (heroSubtitleEl) heroSubtitleEl.textContent = heroSubtitle;
+      },
+      mapToCapabilities: (config) => ({
+        recolorables: [],
+        borderables: [],
+        fontEditable: undefined,
+        fontSizeable: undefined
+      }),
+      mapToEditPanelValues: (config) => new Map([
+        ['platform_name', config.platform_name || defaultConfig.platform_name],
+        ['tagline', config.tagline || defaultConfig.tagline],
+        ['hero_title', config.hero_title || defaultConfig.hero_title],
+        ['hero_subtitle', config.hero_subtitle || defaultConfig.hero_subtitle]
+      ])
+    };
+
+    // Initialize SDKs
+    async function initializeApp() {
+      if (window.elementSdk) {
+        await window.elementSdk.init(element);
+      }
+
+      if (window.dataSdk) {
+        const result = await window.dataSdk.init(dataHandler);
+        if (!result.isOk) {
+          console.error('Failed to initialize Data SDK');
+        }
+      }
+
+      setupEventListeners();
+    }
+
+    function setupEventListeners() {
+      const loginForm = document.getElementById('loginForm');
+      if (loginForm) {
+        loginForm.addEventListener('submit', handleLogin);
+      }
+
+      const createProjectForm = document.getElementById('createProjectForm');
+      if (createProjectForm) {
+        createProjectForm.addEventListener('submit', handleCreateProject);
+      }
+
+      const inventorySearchInput = document.getElementById('inventorySearchInput');
+      if (inventorySearchInput) {
+        inventorySearchInput.addEventListener('input', (e) => {
+          currentSearchTerm = e.target.value.toLowerCase();
+          renderInventory();
+        });
+      }
+
+      const projectFilter = document.getElementById('projectFilter');
+      if (projectFilter) {
+        projectFilter.addEventListener('change', (e) => {
+          currentProjectFilter = e.target.value;
+          renderInventory();
+        });
+      }
+
+      const searchLibraryInput = document.getElementById('searchLibraryInput');
+      if (searchLibraryInput) {
+        searchLibraryInput.addEventListener('input', handleLibrarySearch);
+      }
+
+      const fileInput = document.getElementById('fileInput');
+      if (fileInput) {
+        fileInput.addEventListener('change', handleFileSelect);
+      }
+
+      const dropzone = document.getElementById('dropzone');
+      if (dropzone) {
+        dropzone.addEventListener('click', () => fileInput.click());
+        dropzone.addEventListener('dragover', (e) => {
+          e.preventDefault();
+          dropzone.classList.add('dragover');
+        });
+        dropzone.addEventListener('dragleave', () => {
+          dropzone.classList.remove('dragover');
+        });
+        dropzone.addEventListener('drop', (e) => {
+          e.preventDefault();
+          dropzone.classList.remove('dragover');
+          const files = e.dataTransfer.files;
+          if (files.length > 0) {
+            handleFileSelect({ target: { files } });
+          }
+        });
+      }
+
+      // Role selectors
+      document.querySelectorAll('.role-selector').forEach(selector => {
+        selector.addEventListener('click', function() {
+          document.querySelectorAll('.role-selector').forEach(s => {
+            s.classList.remove('border-blue-500', 'border-purple-500', 'border-orange-500');
+          });
+          
+          const role = this.dataset.role;
+          selectedRole = role;
+          
+          if (role === 'developer') {
+            this.classList.add('border-blue-500');
+          } else if (role === 'legal') {
+            this.classList.add('border-purple-500');
+          } else if (role === 'admin') {
+            this.classList.add('border-orange-500');
+          }
+        });
+      });
+
+      // Navigation links
+      document.querySelectorAll('.nav-link').forEach(link => {
+        link.addEventListener('click', function() {
+          const section = this.dataset.section;
+          if (section) {
+            showSection(section);
+          }
+        });
+      });
+    }
+
+    window.addEventListener('DOMContentLoaded', initializeApp);
+
+    // Role-based credentials
+    const validCredentials = {
+      developer: { username: 'dev', password: 'dev123', displayName: 'John Developer' },
+      legal: { username: 'legal', password: 'legal123', displayName: 'Sarah Legal' },
+      admin: { username: 'admin', password: 'admin123', displayName: 'Admin User' }
+    };
+
+    function showLoginModal() {
+      document.getElementById('loginModal').classList.remove('hidden');
+    }
+
+    function closeLoginModal() {
+      document.getElementById('loginModal').classList.add('hidden');
+    }
+
+    function scrollToSection(sectionId) {
+      const element = document.getElementById(sectionId);
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth' });
+      }
+    }
+
+    function handleLogin(event) {
+      event.preventDefault();
+      
+      const username = document.getElementById('username').value.trim();
+      const password = document.getElementById('password').value;
+
+      if (!selectedRole) {
+        showToast('Please select a role before signing in', 'error');
+        return;
+      }
+
+      const credentials = validCredentials[selectedRole];
+      if (username !== credentials.username || password !== credentials.password) {
+        showToast('Invalid username or password for selected role', 'error');
+        return;
+      }
+
+      currentUser = {
+        username: credentials.displayName,
+        role: selectedRole
+      };
+
+      document.getElementById('homePage').classList.add('hidden');
+      document.getElementById('mainApp').classList.remove('hidden');
+      closeLoginModal();
+
+      document.getElementById('dashboardUsername').textContent = credentials.displayName;
+      
+      const roleBadge = document.getElementById('userRoleBadge');
+      if (selectedRole === 'developer') {
+        roleBadge.className = 'role-badge role-dev';
+        roleBadge.innerHTML = '👨‍💻 Developer';
+        document.getElementById('approvalsNav').classList.add('hidden');
+      } else if (selectedRole === 'legal') {
+        roleBadge.className = 'role-badge role-legal';
+        roleBadge.innerHTML = '⚖️ Legal/GRC';
+        document.getElementById('approvalsNav').classList.remove('hidden');
+      } else if (selectedRole === 'admin') {
+        roleBadge.className = 'role-badge role-admin';
+        roleBadge.innerHTML = '👑 Administrator';
+        document.getElementById('approvalsNav').classList.remove('hidden');
+      }
+
+      showToast('Welcome back, ' + credentials.displayName + '!', 'success');
+      
+      // Load sample data if empty
+      if (!sampleDataLoaded && allLibraries.length === 0) {
+        loadSampleData();
+      }
+    }
+
+    async function loadSampleData() {
+      sampleDataLoaded = true;
+      
+      const sampleProjects = [
+        { name: 'E-Commerce Platform', description: 'Main customer-facing web application' },
+        { name: 'Mobile App', description: 'iOS and Android mobile applications' },
+        { name: 'Internal Tools', description: 'Admin dashboard and internal utilities' }
+      ];
+
+      const sampleLibraries = [
+        { name: 'React', version: '18.2.0', latestVersion: '18.2.0', license: 'MIT', category: 'Frontend', status: 'approved', project: 'E-Commerce Platform', vulns: 0, cvss: '0.0', description: 'JavaScript library for building user interfaces' },
+        { name: 'Express', version: '4.17.1', latestVersion: '4.18.2', license: 'MIT', category: 'Backend', status: 'approved', project: 'E-Commerce Platform', vulns: 1, cvss: '7.5', description: 'Fast, unopinionated web framework for Node.js' },
+        { name: 'Lodash', version: '4.17.19', latestVersion: '4.17.21', license: 'MIT', category: 'Utility', status: 'pending', project: 'E-Commerce Platform', vulns: 3, cvss: '9.1', description: 'Modern JavaScript utility library' },
+        { name: 'Axios', version: '1.4.0', latestVersion: '1.4.0', license: 'MIT', category: 'Utility', status: 'approved', project: 'Mobile App', vulns: 0, cvss: '0.0', description: 'Promise based HTTP client' },
+        { name: 'Vue.js', version: '3.2.47', latestVersion: '3.3.4', license: 'MIT', category: 'Frontend', status: 'pending', project: 'Internal Tools', vulns: 0, cvss: '0.0', description: 'Progressive JavaScript framework' },
+        { name: 'Django', version: '4.1.0', latestVersion: '4.2.3', license: 'BSD-3-Clause', category: 'Backend', status: 'approved', project: 'Internal Tools', vulns: 2, cvss: '6.5', description: 'High-level Python web framework' },
+        { name: 'jQuery', version: '3.6.0', latestVersion: '3.7.0', license: 'MIT', category: 'Frontend', status: 'rejected', project: 'E-Commerce Platform', vulns: 0, cvss: '0.0', description: 'Fast, small JavaScript library' },
+        { name: 'Bootstrap', version: '5.2.3', latestVersion: '5.3.0', license: 'MIT', category: 'Frontend', status: 'approved', project: 'E-Commerce Platform', vulns: 0, cvss: '0.0', description: 'Popular CSS framework' }
+      ];
+
+      if (!window.dataSdk) return;
+
+      // Create projects first
+      for (const proj of sampleProjects) {
+        const project = {
+          id: 'proj_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9),
+          type: 'project',
+          name: proj.name,
+          version: '',
+          latestVersion: '',
+          license: '',
+          status: '',
+          requestedBy: currentUser ? currentUser.username : 'System',
+          requestedDate: new Date().toISOString(),
+          reviewedBy: '',
+          reviewedDate: '',
+          projectId: '',
+          projectName: proj.name,
+          category: '',
+          vulnerabilities: 0,
+          cvssScore: '',
+          notes: proj.description,
+          approvalNotes: '',
+          description: proj.description
+        };
+        await window.dataSdk.create(project);
+        await new Promise(resolve => setTimeout(resolve, 100));
+      }
+
+      // Create libraries
+      for (const lib of sampleLibraries) {
+        const library = {
+          id: 'lib_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9),
+          type: 'library',
+          name: lib.name,
+          version: lib.version,
+          latestVersion: lib.latestVersion,
+          license: lib.license,
+          category: lib.category,
+          status: lib.status,
+          requestedBy: currentUser ? currentUser.username : 'System',
+          requestedDate: new Date(Date.now() - Math.random() * 7 * 24 * 60 * 60 * 1000).toISOString(),
+          reviewedBy: lib.status === 'approved' || lib.status === 'rejected' ? 'Sarah Legal' : '',
+          reviewedDate: lib.status === 'approved' || lib.status === 'rejected' ? new Date(Date.now() - Math.random() * 3 * 24 * 60 * 60 * 1000).toISOString() : '',
+          projectId: lib.project,
+          projectName: lib.project,
+          vulnerabilities: lib.vulns,
+          cvssScore: lib.cvss,
+          notes: lib.description,
+          approvalNotes: lib.status === 'rejected' ? 'Security concerns with this version' : '',
+          description: lib.description
+        };
+        await window.dataSdk.create(library);
+        await new Promise(resolve => setTimeout(resolve, 100));
+      }
+
+      showToast('Sample data loaded successfully', 'success');
+    }
+
+    function showSection(section) {
+      document.querySelectorAll('.nav-link').forEach(link => {
+        link.classList.remove('active');
+      });
+      
+      const activeLink = document.querySelector(`.nav-link[data-section="${section}"]`);
+      if (activeLink) {
+        activeLink.classList.add('active');
+      }
+
+      document.getElementById('dashboardSection').classList.add('hidden');
+      document.getElementById('inventorySection').classList.add('hidden');
+      document.getElementById('projectsSection').classList.add('hidden');
+      document.getElementById('approvalsSection').classList.add('hidden');
+
+      if (section === 'dashboard') {
+        document.getElementById('dashboardSection').classList.remove('hidden');
+      } else if (section === 'inventory') {
+        document.getElementById('inventorySection').classList.remove('hidden');
+      } else if (section === 'projects') {
+        document.getElementById('projectsSection').classList.remove('hidden');
+      } else if (section === 'approvals') {
+        document.getElementById('approvalsSection').classList.remove('hidden');
+      }
+    }
+
+    function logout() {
+      currentUser = null;
+      selectedRole = null;
+      
+      document.getElementById('username').value = '';
+      document.getElementById('password').value = '';
+      
+      document.getElementById('mainApp').classList.add('hidden');
+      document.getElementById('homePage').classList.remove('hidden');
+
+      showSection('dashboard');
+      showToast('Logged out successfully', 'success');
+    }
+
+    // Dashboard Stats
+    function updateDashboardStats() {
+      const libraries = allLibraries.filter(lib => lib.type === 'library');
+      
+      const totalEl = document.getElementById('totalLibrariesStat');
+      const approvedEl = document.getElementById('approvedStat');
+      const pendingEl = document.getElementById('pendingStat');
+      const vulnEl = document.getElementById('vulnerabilitiesStat');
+
+      if (totalEl) totalEl.textContent = libraries.length;
+      if (approvedEl) approvedEl.textContent = libraries.filter(lib => lib.status === 'approved').length;
+      if (pendingEl) pendingEl.textContent = libraries.filter(lib => lib.status === 'pending').length;
+      if (vulnEl) vulnEl.textContent = libraries.reduce((sum, lib) => sum + (lib.vulnerabilities || 0), 0);
+
+      const activityList = document.getElementById('recentActivityList');
+      if (activityList) {
+        const recentLibs = [...libraries].sort((a, b) => 
+          new Date(b.requestedDate) - new Date(a.requestedDate)
+        ).slice(0, 5);
+
+        if (recentLibs.length === 0) {
+          activityList.innerHTML = `
+            <div class="text-center py-8 text-slate-500">
+              <div class="text-4xl mb-2">📋</div>
+              <p class="text-sm">No recent activity</p>
+            </div>
+          `;
+        } else {
+          activityList.innerHTML = recentLibs.map(lib => `
+            <div class="flex items-center gap-3 p-3 bg-slate-50 rounded-lg hover:bg-slate-100 transition cursor-pointer" onclick="openLibraryDetails('${lib.__backendId}')">
+              <div class="w-10 h-10 rounded-lg flex items-center justify-center text-xl ${
+                lib.status === 'approved' ? 'bg-green-100' : 
+                lib.status === 'pending' ? 'bg-yellow-100' : 'bg-red-100'
+              }">
+                ${lib.status === 'approved' ? '✅' : lib.status === 'pending' ? '⏳' : '❌'}
+              </div>
+              <div class="flex-1">
+                <p class="font-semibold text-slate-800">${lib.name} v${lib.version}</p>
+                <p class="text-xs text-slate-600">${lib.projectName || 'No Project'} • ${lib.requestedBy}</p>
+              </div>
+            </div>
+          `).join('');
+        }
+      }
+    }
+
+    // Inventory Management
+    function renderInventory() {
+      const grid = document.getElementById('inventoryGrid');
+      if (!grid) return;
+
+      let filteredLibraries = allLibraries.filter(lib => lib.type === 'library');
+
+      // Apply status filter
+      if (currentFilter === 'approved') {
+        filteredLibraries = filteredLibraries.filter(lib => lib.status === 'approved');
+      } else if (currentFilter === 'pending') {
+        filteredLibraries = filteredLibraries.filter(lib => lib.status === 'pending');
+      } else if (currentFilter === 'rejected') {
+        filteredLibraries = filteredLibraries.filter(lib => lib.status === 'rejected');
+      } else if (currentFilter === 'vulnerable') {
+        filteredLibraries = filteredLibraries.filter(lib => lib.vulnerabilities > 0);
+      } else if (currentFilter === 'outdated') {
+        filteredLibraries = filteredLibraries.filter(lib => lib.version !== lib.latestVersion);
+      }
+
+      // Apply project filter
+      if (currentProjectFilter !== 'all') {
+        filteredLibraries = filteredLibraries.filter(lib => lib.projectName === currentProjectFilter);
+      }
+
+      // Apply search filter
+      if (currentSearchTerm) {
+        filteredLibraries = filteredLibraries.filter(lib => 
+          lib.name.toLowerCase().includes(currentSearchTerm) ||
+          lib.version.toLowerCase().includes(currentSearchTerm) ||
+          lib.license.toLowerCase().includes(currentSearchTerm)
+        );
+      }
+
+      if (filteredLibraries.length === 0) {
+        grid.innerHTML = `
+          <div class="col-span-full text-center py-12 text-slate-500">
+            <div class="text-6xl mb-4">🔍</div>
+            <p class="text-lg font-semibold mb-2">No libraries found</p>
+            <p class="text-sm">Try adjusting your filters or search term</p>
+          </div>
+        `;
+        return;
+      }
+
+      grid.innerHTML = filteredLibraries.map(lib => {
+        const isOutdated = lib.version !== lib.latestVersion;
+        const vulnLevel = lib.vulnerabilities === 0 ? 'none' : 
+                         parseFloat(lib.cvssScore) >= 9 ? 'critical' :
+                         parseFloat(lib.cvssScore) >= 7 ? 'high' :
+                         parseFloat(lib.cvssScore) >= 4 ? 'medium' : 'low';
+        
+        return `
+          <div class="library-card" onclick="openLibraryDetails('${lib.__backendId}')">
+            <div class="flex items-start justify-between mb-3">
+              <div class="flex-1">
+                <h3 class="font-bold text-slate-800 text-lg mb-1">${lib.name}</h3>
+                <p class="text-sm text-slate-600">v${lib.version} ${isOutdated ? `<span class="text-orange-600">→ v${lib.latestVersion}</span>` : ''}</p>
+              </div>
+              <span class="status-badge status-${lib.status}">
+                ${lib.status === 'approved' ? '✅' : lib.status === 'pending' ? '⏳' : '❌'} 
+                ${lib.status.charAt(0).toUpperCase() + lib.status.slice(1)}
+              </span>
+            </div>
+            <div class="space-y-2 mb-3">
+              <div class="flex items-center gap-2 text-sm">
+                <span class="text-slate-500">📜</span>
+                <span class="text-slate-700">${lib.license}</span>
+              </div>
+              <div class="flex items-center gap-2 text-sm">
+                <span class="text-slate-500">📁</span>
+                <span class="text-slate-700">${lib.projectName || 'No Project'}</span>
+              </div>
+              ${lib.vulnerabilities > 0 ? `
+                <div class="flex items-center gap-2 text-sm">
+                  <span class="vuln-${vulnLevel} px-2 py-1 rounded text-xs font-bold">
+                    ⚠️ ${lib.vulnerabilities} CVE (${lib.cvssScore})
+                  </span>
+                </div>
+              ` : ''}
+              ${isOutdated ? `
+                <div class="flex items-center gap-2 text-sm">
+                  <span class="text-orange-600 font-semibold">🔄 Update Available</span>
+                </div>
+              ` : ''}
+            </div>
+            <div class="pt-3 border-t border-slate-200 text-xs text-slate-500">
+              <p>Added by ${lib.requestedBy}</p>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function filterInventory(filter) {
+      currentFilter = filter;
+      
+      document.querySelectorAll('#inventorySection .filter-chip').forEach(chip => {
+        chip.classList.remove('active');
+      });
+      event.currentTarget.classList.add('active');
+      
+      renderInventory();
+    }
+
+    function openLibraryDetails(backendId) {
+      const library = allLibraries.find(lib => lib.__backendId === backendId);
+      if (!library) return;
+
+      const canReview = currentUser && (currentUser.role === 'legal' || currentUser.role === 'admin');
+      const isPending = library.status === 'pending';
+      const isApproved = library.status === 'approved';
+      const isDeveloper = currentUser && currentUser.role === 'developer';
+
+      const content = document.getElementById('libraryDetailsContent');
+      content.innerHTML = `
+        <div class="space-y-4">
+          <div class="flex items-start justify-between">
+            <div>
+              <h3 class="text-2xl font-bold text-slate-800 mb-1">${library.name}</h3>
+              <p class="text-lg text-slate-600">Version ${library.version}</p>
+              ${library.version !== library.latestVersion ? `
+                <p class="text-orange-600 font-semibold mt-1">⚠️ Latest: v${library.latestVersion}</p>
+              ` : ''}
+            </div>
+            <span class="status-badge status-${library.status}">
+              ${library.status === 'approved' ? '✅' : library.status === 'pending' ? '⏳' : '❌'} 
+              ${library.status.charAt(0).toUpperCase() + library.status.slice(1)}
+            </span>
+          </div>
+
+          <div class="grid grid-cols-2 gap-4 py-4 border-y border-slate-200">
+            <div>
+              <p class="text-sm text-slate-500 mb-1">License</p>
+              <p class="font-semibold text-slate-800">${library.license}</p>
+            </div>
+            <div>
+              <p class="text-sm text-slate-500 mb-1">Category</p>
+              <p class="font-semibold text-slate-800">${library.category}</p>
+            </div>
+            <div>
+              <p class="text-sm text-slate-500 mb-1">Project</p>
+              <p class="font-semibold text-slate-800">${library.projectName || 'No Project'}</p>
+            </div>
+            <div>
+              <p class="text-sm text-slate-500 mb-1">Added By</p>
+              <p class="font-semibold text-slate-800">${library.requestedBy}</p>
+            </div>
+            ${library.reviewedBy ? `
+              <div>
+                <p class="text-sm text-slate-500 mb-1">Reviewed By</p>
+                <p class="font-semibold text-slate-800">${library.reviewedBy}</p>
+              </div>
+              <div>
+                <p class="text-sm text-slate-500 mb-1">Reviewed Date</p>
+                <p class="font-semibold text-slate-800">${new Date(library.reviewedDate).toLocaleDateString()}</p>
+              </div>
+            ` : ''}
+          </div>
+
+          ${library.vulnerabilities > 0 ? `
+            <div class="bg-red-50 border-2 border-red-200 rounded-lg p-4">
+              <div class="flex items-center gap-2 mb-2">
+                <span class="text-2xl">⚠️</span>
+                <h4 class="font-bold text-red-800">Security Vulnerabilities</h4>
+              </div>
+              <p class="text-sm text-red-700 mb-2">${library.vulnerabilities} known CVE(s) detected with CVSS score: ${library.cvssScore}</p>
+              <p class="text-xs text-red-600">Review recommended before approval. Consider updating to latest version.</p>
+            </div>
+          ` : ''}
+
+          ${library.notes ? `
+            <div>
+              <p class="text-sm text-slate-500 mb-2">Notes</p>
+              <p class="text-slate-700 bg-slate-50 p-4 rounded-lg">${library.notes}</p>
+            </div>
+          ` : ''}
+
+          ${library.approvalNotes ? `
+            <div>
+              <p class="text-sm text-slate-500 mb-2">Approval Notes</p>
+              <p class="text-slate-700 bg-slate-50 p-4 rounded-lg">${library.approvalNotes}</p>
+            </div>
+          ` : ''}
+
+          <div class="flex gap-3 pt-4">
+            ${canReview && isPending ? `
+              <button onclick="approveLibrary('${library.__backendId}')" class="flex-1 bg-green-600 text-white py-3 rounded-lg font-bold hover:bg-green-700 transition">
+                ✅ Approve
+              </button>
+              <button onclick="rejectLibrary('${library.__backendId}')" class="flex-1 bg-red-600 text-white py-3 rounded-lg font-bold hover:bg-red-700 transition">
+                ❌ Reject
+              </button>
+            ` : ''}
+            ${isDeveloper && isApproved ? `
+              <button onclick="useLibrary('${library.__backendId}')" class="flex-1 bg-green-600 text-white py-3 rounded-lg font-bold hover:bg-green-700 transition">
+                ✅ Use This Library
+              </button>
+            ` : ''}
+            <button onclick="deleteLibrary('${library.__backendId}')" class="px-6 py-3 bg-slate-200 text-slate-800 rounded-lg font-semibold hover:bg-slate-300 transition">
+              🗑️ Delete
+            </button>
+            <button onclick="closeLibraryDetailsModal()" class="px-6 py-3 bg-slate-200 text-slate-800 rounded-lg font-semibold hover:bg-slate-300 transition">
+              Close
+            </button>
+          </div>
+        </div>
+      `;
+
+      document.getElementById('libraryDetailsModal').classList.remove('hidden');
+    }
+
+    function closeLibraryDetailsModal() {
+      document.getElementById('libraryDetailsModal').classList.add('hidden');
+    }
+
+    async function approveLibrary(backendId) {
+      const library = allLibraries.find(lib => lib.__backendId === backendId);
+      if (!library) return;
+
+      library.status = 'approved';
+      library.reviewedBy = currentUser ? currentUser.username : 'Unknown';
+      library.reviewedDate = new Date().toISOString();
+
+      if (window.dataSdk) {
+        const result = await window.dataSdk.update(library);
+        if (result.isOk) {
+          showToast('Library approved successfully!', 'success');
+          closeLibraryDetailsModal();
+        } else {
+          showToast('Failed to approve library', 'error');
+        }
+      }
+    }
+
+    async function rejectLibrary(backendId) {
+      const library = allLibraries.find(lib => lib.__backendId === backendId);
+      if (!library) return;
+
+      library.status = 'rejected';
+      library.reviewedBy = currentUser ? currentUser.username : 'Unknown';
+      library.reviewedDate = new Date().toISOString();
+      library.approvalNotes = 'Rejected due to compliance concerns';
+
+      if (window.dataSdk) {
+        const result = await window.dataSdk.update(library);
+        if (result.isOk) {
+          showToast('Library rejected', 'success');
+          closeLibraryDetailsModal();
+        } else {
+          showToast('Failed to reject library', 'error');
+        }
+      }
+    }
+
+    function useLibrary(backendId) {
+      const library = allLibraries.find(lib => lib.__backendId === backendId);
+      if (!library) return;
+
+      showToast(`You can now use ${library.name} v${library.version} in your project!`, 'success');
+      closeLibraryDetailsModal();
+    }
+
+    async function deleteLibrary(backendId) {
+      const library = allLibraries.find(lib => lib.__backendId === backendId);
+      if (!library) return;
+
+      const content = document.getElementById('libraryDetailsContent');
+      content.innerHTML = `
+        <div class="text-center py-8">
+          <div class="text-6xl mb-4">⚠️</div>
+          <h3 class="text-2xl font-bold text-slate-800 mb-2">Delete Library?</h3>
+          <p class="text-slate-600 mb-6">Are you sure you want to delete "${library.name}"? This action cannot be undone.</p>
+          <div class="flex gap-3 justify-center">
+            <button onclick="confirmDeleteLibrary('${backendId}')" class="px-6 py-3 bg-red-600 text-white rounded-lg font-bold hover:bg-red-700 transition">
+              Yes, Delete
+            </button>
+            <button onclick="openLibraryDetails('${backendId}')" class="px-6 py-3 bg-slate-200 text-slate-800 rounded-lg font-semibold hover:bg-slate-300 transition">
+              Cancel
+            </button>
+          </div>
+        </div>
+      `;
+    }
+
+    async function confirmDeleteLibrary(backendId) {
+      const library = allLibraries.find(lib => lib.__backendId === backendId);
+      if (!library) return;
+
+      if (window.dataSdk) {
+        const result = await window.dataSdk.delete(library);
+        if (result.isOk) {
+          showToast('Library deleted successfully', 'success');
+          closeLibraryDetailsModal();
+        } else {
+          showToast('Failed to delete library', 'error');
+        }
+      }
+    }
+
+    // Import functionality
+    function openImportModal() {
+      updateProjectSelects();
+      document.getElementById('importModal').classList.remove('hidden');
+    }
+
+    function closeImportModal() {
+      document.getElementById('importModal').classList.add('hidden');
+      document.getElementById('importPreview').classList.add('hidden');
+      document.getElementById('fileInput').value = '';
+      importedData = [];
+    }
+
+    function handleFileSelect(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const text = e.target.result;
+        parseCSV(text);
+      };
+      reader.readAsText(file);
+    }
+
+    function parseCSV(text) {
+      const lines = text.split('\n').filter(line => line.trim());
+      if (lines.length < 2) {
+        showToast('Invalid file format', 'error');
+        return;
+      }
+
+      const headers = lines[0].split(',').map(h => h.trim().toLowerCase());
+      importedData = [];
+
+      for (let i = 1; i < lines.length; i++) {
+        const values = lines[i].split(',').map(v => v.trim());
+        const lib = {
+          name: values[headers.indexOf('name')] || '',
+          version: values[headers.indexOf('version')] || '1.0.0',
+          license: values[headers.indexOf('license')] || 'Unknown',
+          category: values[headers.indexOf('category')] || 'Other'
+        };
+        
+        if (lib.name) {
+          importedData.push(lib);
+        }
+      }
+
+      displayImportPreview();
+    }
+
+    function displayImportPreview() {
+      const preview = document.getElementById('importPreview');
+      const tbody = document.getElementById('importPreviewBody');
+      
+      tbody.innerHTML = importedData.slice(0, 5).map(lib => `
+        <tr class="border-b">
+          <td class="px-4 py-2">${lib.name}</td>
+          <td class="px-4 py-2">${lib.version}</td>
+          <td class="px-4 py-2">${lib.license}</td>
+          <td class="px-4 py-2">${lib.category}</td>
+        </tr>
+      `).join('');
+
+      preview.classList.remove('hidden');
+      document.getElementById('importButton').disabled = false;
+    }
+
+    async function processImport() {
+      if (allLibraries.length + importedData.length > 999) {
+        showToast('Import would exceed 999 library limit', 'error');
+        return;
+      }
+
+      const projectId = document.getElementById('importProjectSelect').value;
+      if (!projectId) {
+        showToast('Please select a project', 'error');
+        return;
+      }
+
+      const projectName = document.getElementById('importProjectSelect').selectedOptions[0].text;
+
+      const button = document.getElementById('importButton');
+      button.innerHTML = '<div class="loading-spinner mx-auto"></div>';
+      button.disabled = true;
+
+      for (const lib of importedData) {
+        const library = {
+          id: 'lib_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9),
+          type: 'library',
+          name: lib.name,
+          version: lib.version,
+          latestVersion: lib.version,
+          license: lib.license,
+          category: lib.category,
+          status: 'pending',
+          requestedBy: currentUser ? currentUser.username : 'Unknown',
+          requestedDate: new Date().toISOString(),
+          reviewedBy: '',
+          reviewedDate: '',
+          projectId: projectId,
+          projectName: projectName,
+          vulnerabilities: 0,
+          cvssScore: '0.0',
+          notes: 'Imported from spreadsheet',
+          approvalNotes: '',
+          description: ''
+        };
+
+        if (window.dataSdk) {
+          await window.dataSdk.create(library);
+        }
+      }
+
+      button.innerHTML = 'Import Libraries';
+      button.disabled = false;
+
+      showToast(`Successfully imported ${importedData.length} libraries`, 'success');
+      closeImportModal();
+    }
+
+    // Scan functionality
+    function openScanModal() {
+      updateProjectSelects();
+      document.getElementById('scanModal').classList.remove('hidden');
+    }
+
+    function closeScanModal() {
+      document.getElementById('scanModal').classList.add('hidden');
+      document.getElementById('scanResults').classList.add('hidden');
+    }
+
+    async function performScan() {
+      if (allLibraries.length >= 999) {
+        showToast('Maximum limit of 999 libraries reached', 'error');
+        return;
+      }
+
+      const projectId = document.getElementById('scanProjectSelect').value;
+      if (!projectId) {
+        showToast('Please select a project', 'error');
+        return;
+      }
+
+      const projectName = document.getElementById('scanProjectSelect').selectedOptions[0].text;
+
+      const button = document.getElementById('scanButton');
+      button.innerHTML = '<div class="loading-spinner mx-auto"></div>';
+      button.disabled = true;
+
+      // Simulate system scan
+      await new Promise(resolve => setTimeout(resolve, 2000));
+
+      const mockLibraries = [
+        { name: 'Webpack', version: '5.75.0', latestVersion: '5.88.2', license: 'MIT', category: 'Build Tool', vulns: 1, cvss: '5.3' },
+        { name: 'TypeScript', version: '4.9.5', latestVersion: '5.1.6', license: 'Apache-2.0', category: 'Language', vulns: 0, cvss: '0.0' },
+        { name: 'Moment.js', version: '2.29.1', latestVersion: '2.29.4', license: 'MIT', category: 'Utility', vulns: 2, cvss: '7.5' },
+        { name: 'Chart.js', version: '4.3.0', latestVersion: '4.3.0', license: 'MIT', category: 'Visualization', vulns: 0, cvss: '0.0' }
+      ];
+
+      const resultsList = document.getElementById('scanResultsList');
+      resultsList.innerHTML = mockLibraries.map(lib => `
+        <div class="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
+          <div class="flex-1">
+            <p class="font-semibold text-slate-800">${lib.name} v${lib.version}</p>
+            <p class="text-xs text-slate-600">Latest: v${lib.latestVersion} ${lib.vulns > 0 ? `• ${lib.vulns} CVE (${lib.cvss})` : '• No vulnerabilities'}</p>
+          </div>
+          <button onclick="addScannedLibrary('${lib.name}', '${lib.version}', '${lib.latestVersion}', '${lib.license}', '${lib.category}', ${lib.vulns}, '${lib.cvss}', '${projectId}', '${projectName}')" class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition text-sm font-semibold">
+            Add
+          </button>
+        </div>
+      `).join('');
+
+      document.getElementById('scanResults').classList.remove('hidden');
+      button.innerHTML = 'Scan Complete';
+      button.disabled = false;
+
+      showToast('System scan completed', 'success');
+    }
+
+    async function addScannedLibrary(name, version, latestVersion, license, category, vulns, cvss, projectId, projectName) {
+      if (allLibraries.length >= 999) {
+        showToast('Maximum limit of 999 libraries reached', 'error');
+        return;
+      }
+
+      const library = {
+        id: 'lib_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9),
+        type: 'library',
+        name: name,
+        version: version,
+        latestVersion: latestVersion,
+        license: license,
+        category: category,
+        status: 'pending',
+        requestedBy: currentUser ? currentUser.username : 'Unknown',
+        requestedDate: new Date().toISOString(),
+        reviewedBy: '',
+        reviewedDate: '',
+        projectId: projectId,
+        projectName: projectName,
+        vulnerabilities: vulns,
+        cvssScore: cvss,
+        notes: 'Added from system scan',
+        approvalNotes: '',
+        description: ''
+      };
+
+      if (window.dataSdk) {
+        const result = await window.dataSdk.create(library);
+        if (result.isOk) {
+          showToast(`${name} added to inventory`, 'success');
+          event.target.disabled = true;
+          event.target.textContent = 'Added';
+        } else {
+          showToast('Failed to add library', 'error');
+        }
+      }
+    }
+
+    // Search functionality
+    function openSearchModal() {
+      document.getElementById('searchModal').classList.remove('hidden');
+    }
+
+    function closeSearchModal() {
+      document.getElementById('searchModal').classList.add('hidden');
+    }
+
+    function handleLibrarySearch(event) {
+      const searchTerm = event.target.value.toLowerCase().trim();
+      const resultsDiv = document.getElementById('searchResults');
+
+      if (!searchTerm) {
+        resultsDiv.innerHTML = `
+          <div class="text-center py-8 text-slate-500">
+            <div class="text-4xl mb-2">🔎</div>
+            <p class="text-sm">Enter a library name to search</p>
+          </div>
+        `;
+        return;
+      }
+
+      // Search in existing libraries
+      const matches = allLibraries.filter(lib => 
+        lib.type === 'library' && lib.name.toLowerCase().includes(searchTerm)
+      );
+
+      if (matches.length === 0) {
+        resultsDiv.innerHTML = `
+          <div class="text-center py-8 text-slate-500">
+            <div class="text-4xl mb-2">❌</div>
+            <p class="text-sm mb-4">No approved libraries found for "${searchTerm}"</p>
+            <button onclick="requestNewLibrary('${searchTerm}')" class="px-6 py-3 gradient-bg text-white rounded-lg hover:opacity-90 transition font-semibold">
+              Request Approval
+            </button>
+          </div>
+        `;
+      } else {
+        resultsDiv.innerHTML = `
+          <div class="space-y-3">
+            ${matches.map(lib => `
+              <div class="p-4 bg-slate-50 rounded-lg hover:bg-slate-100 transition cursor-pointer" onclick="openLibraryDetails('${lib.__backendId}')">
+                <div class="flex items-start justify-between mb-2">
+                  <div>
+                    <h4 class="font-bold text-slate-800">${lib.name} v${lib.version}</h4>
+                    <p class="text-sm text-slate-600">${lib.license} • ${lib.projectName || 'No Project'}</p>
+                  </div>
+                  <span class="status-badge status-${lib.status}">
+                    ${lib.status === 'approved' ? '✅' : lib.status === 'pending' ? '⏳' : '❌'} 
+                    ${lib.status.charAt(0).toUpperCase() + lib.status.slice(1)}
+                  </span>
+                </div>
+                ${lib.status === 'approved' ? `
+                  <button onclick="event.stopPropagation(); useLibrary('${lib.__backendId}')" class="w-full mt-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition font-semibold">
+                    Use This Library
+                  </button>
+                ` : lib.status === 'pending' ? `
+                  <p class="text-sm text-orange-600 mt-2">⏳ Awaiting approval from Legal/GRC team</p>
+                ` : ''}
+              </div>
+            `).join('')}
+          </div>
+        `;
+      }
+    }
+
+    function requestNewLibrary(libraryName) {
+      selectedLibraryForApproval = { name: libraryName };
+      closeSearchModal();
+      openRequestApprovalModal();
+    }
+
+    function openRequestApprovalModal() {
+      const infoDiv = document.getElementById('requestApprovalLibraryInfo');
+      infoDiv.innerHTML = `
+        <div class="bg-slate-50 rounded-lg p-4">
+          <h4 class="font-bold text-slate-800 mb-2">Library Information</h4>
+          <p class="text-sm text-slate-600">Name: <span class="font-semibold">${selectedLibraryForApproval.name}</span></p>
+        </div>
+      `;
+      document.getElementById('requestApprovalModal').classList.remove('hidden');
+    }
+
+    function closeRequestApprovalModal() {
+      document.getElementById('requestApprovalModal').classList.add('hidden');
+      document.getElementById('requestNotes').value = '';
+      selectedLibraryForApproval = null;
+    }
+
+    async function submitApprovalRequest() {
+      if (allLibraries.length >= 999) {
+        showToast('Maximum limit of 999 libraries reached', 'error');
+        return;
+      }
+
+      const notes = document.getElementById('requestNotes').value.trim();
+      if (!notes) {
+        showToast('Please provide justification for this request', 'error');
+        return;
+      }
+
+      const button = document.getElementById('submitApprovalRequestButton');
+      button.innerHTML = '<div class="loading-spinner mx-auto"></div>';
+      button.disabled = true;
+
+      const library = {
+        id: 'lib_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9),
+        type: 'library',
+        name: selectedLibraryForApproval.name,
+        version: '1.0.0',
+        latestVersion: '1.0.0',
+        license: 'Unknown',
+        category: 'Other',
+        status: 'pending',
+        requestedBy: currentUser ? currentUser.username : 'Unknown',
+        requestedDate: new Date().toISOString(),
+        reviewedBy: '',
+        reviewedDate: '',
+        projectId: '',
+        projectName: '',
+        vulnerabilities: 0,
+        cvssScore: '0.0',
+        notes: notes,
+        approvalNotes: '',
+        description: ''
+      };
+
+      if (window.dataSdk) {
+        const result = await window.dataSdk.create(library);
+        
+        button.innerHTML = 'Submit Request';
+        button.disabled = false;
+
+        if (result.isOk) {
+          showToast('Approval request submitted to Legal/GRC team', 'success');
+          closeRequestApprovalModal();
+        } else {
+          showToast('Failed to submit request', 'error');
+        }
+      }
+    }
+
+    // Projects Management
+    function renderProjects() {
+      const grid = document.getElementById('projectsGrid');
+      if (!grid) return;
+
+      if (allProjects.size === 0) {
+        grid.innerHTML = `
+          <div class="col-span-full text-center py-12 text-slate-500">
+            <div class="text-6xl mb-4">📁</div>
+            <p class="text-lg font-semibold mb-2">No projects yet</p>
+            <p class="text-sm mb-4">Create your first project to organize libraries</p>
+            <button onclick="openCreateProjectModal()" class="px-6 py-3 gradient-bg text-white rounded-lg hover:opacity-90 transition font-semibold">
+              Create Project
+            </button>
+          </div>
+        `;
+        return;
+      }
+
+      const projectStats = {};
+      allProjects.forEach(projectName => {
+        const libs = allLibraries.filter(lib => lib.type === 'library' && lib.projectName === projectName);
+        projectStats[projectName] = {
+          total: libs.length,
+          approved: libs.filter(lib => lib.status === 'approved').length,
+          pending: libs.filter(lib => lib.status === 'pending').length,
+          vulnerable: libs.filter(lib => lib.vulnerabilities > 0).length
+        };
+      });
+
+      grid.innerHTML = Array.from(allProjects).map(projectName => {
+        const stats = projectStats[projectName];
+        return `
+          <div class="project-card">
+            <div class="flex items-start justify-between mb-4">
+              <div class="flex items-center gap-3">
+                <div class="w-12 h-12 gradient-bg rounded-lg flex items-center justify-center text-white text-2xl">
+                  📁
+                </div>
+                <div>
+                  <h3 class="font-bold text-slate-800 text-lg">${projectName}</h3>
+                  <p class="text-sm text-slate-600">${stats.total} libraries</p>
+                </div>
+              </div>
+            </div>
+            <div class="grid grid-cols-2 gap-3 mb-4">
+              <div class="bg-green-50 rounded-lg p-3">
+                <p class="text-xs text-green-700 mb-1">Approved</p>
+                <p class="text-2xl font-bold text-green-800">${stats.approved}</p>
+              </div>
+              <div class="bg-orange-50 rounded-lg p-3">
+                <p class="text-xs text-orange-700 mb-1">Pending</p>
+                <p class="text-2xl font-bold text-orange-800">${stats.pending}</p>
+              </div>
+            </div>
+            ${stats.vulnerable > 0 ? `
+              <div class="bg-red-50 border-2 border-red-200 rounded-lg p-3 mb-4">
+                <p class="text-sm text-red-700 font-semibold">⚠️ ${stats.vulnerable} vulnerable libraries</p>
+              </div>
+            ` : ''}
+            <button onclick="viewProjectLibraries('${projectName}')" class="w-full px-4 py-2 gradient-bg text-white rounded-lg hover:opacity-90 transition font-semibold">
+              View Libraries
+            </button>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function viewProjectLibraries(projectName) {
+      currentProjectFilter = projectName;
+      document.getElementById('projectFilter').value = projectName;
+      showSection('inventory');
+    }
+
+    function openCreateProjectModal() {
+      document.getElementById('createProjectModal').classList.remove('hidden');
+    }
+
+    function closeCreateProjectModal() {
+      document.getElementById('createProjectModal').classList.add('hidden');
+      document.getElementById('createProjectForm').reset();
+    }
+
+    async function handleCreateProject(event) {
+      event.preventDefault();
+
+      const projectName = document.getElementById('projectName').value.trim();
+      const projectDescription = document.getElementById('projectDescription').value.trim();
+
+      if (allProjects.has(projectName)) {
+        showToast('Project with this name already exists', 'error');
+        return;
+      }
+
+      const button = document.getElementById('createProjectButton');
+      button.innerHTML = '<div class="loading-spinner mx-auto"></div>';
+      button.disabled = true;
+
+      // Create a project marker entry
+      const project = {
+        id: 'proj_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9),
+        type: 'project',
+        name: projectName,
+        version: '',
+        latestVersion: '',
+        license: '',
+        status: '',
+        requestedBy: currentUser ? currentUser.username : 'Unknown',
+        requestedDate: new Date().toISOString(),
+        reviewedBy: '',
+        reviewedDate: '',
+        projectId: '',
+        projectName: projectName,
+        category: '',
+        vulnerabilities: 0,
+        cvssScore: '',
+        notes: projectDescription,
+        approvalNotes: '',
+        description: projectDescription
+      };
+
+      if (window.dataSdk) {
+        const result = await window.dataSdk.create(project);
+        
+        button.innerHTML = 'Create Project';
+        button.disabled = false;
+
+        if (result.isOk) {
+          showToast(`Project "${projectName}" created successfully`, 'success');
+          closeCreateProjectModal();
+        } else {
+          showToast('Failed to create project', 'error');
+        }
+      }
+    }
+
+    function updateProjectSelects() {
+      const importSelect = document.getElementById('importProjectSelect');
+      const scanSelect = document.getElementById('scanProjectSelect');
+
+      const options = Array.from(allProjects).map(projectName => 
+        `<option value="${projectName}">${projectName}</option>`
+      ).join('');
+
+      if (importSelect) {
+        importSelect.innerHTML = '<option value="">Select a project</option>' + options;
+      }
+      if (scanSelect) {
+        scanSelect.innerHTML = '<option value="">Select a project</option>' + options;
+      }
+    }
+
+    function updateProjectFilters() {
+      const projectFilter = document.getElementById('projectFilter');
+      if (!projectFilter) return;
+
+      const options = Array.from(allProjects).map(projectName => 
+        `<option value="${projectName}">${projectName}</option>`
+      ).join('');
+
+      projectFilter.innerHTML = '<option value="all">All Projects</option>' + options;
+    }
+
+    // Approvals Section
+    function renderApprovals() {
+      const grid = document.getElementById('approvalsGrid');
+      if (!grid) return;
+
+      const pendingLibraries = allLibraries.filter(lib => lib.type === 'library' && lib.status === 'pending');
+
+      if (pendingLibraries.length === 0) {
+        grid.innerHTML = `
+          <div class="text-center py-12 text-slate-500">
+            <div class="text-6xl mb-4">✅</div>
+            <p class="text-lg font-semibold mb-2">No pending approvals</p>
+            <p class="text-sm">All library requests have been reviewed</p>
+          </div>
+        `;
+        return;
+      }
+
+      grid.innerHTML = pendingLibraries.map(lib => `
+        <div class="bg-white rounded-xl shadow-lg p-6 border-2 border-orange-200">
+          <div class="flex items-start justify-between mb-4">
+            <div class="flex-1">
+              <h3 class="text-xl font-bold text-slate-800 mb-1">${lib.name} v${lib.version}</h3>
+              <p class="text-sm text-slate-600 mb-2">${lib.license} • ${lib.category}</p>
+              <p class="text-sm text-slate-600">Project: ${lib.projectName || 'No Project'}</p>
+            </div>
+            <span class="status-badge status-pending">⏳ Pending</span>
+          </div>
+
+          ${lib.vulnerabilities > 0 ? `
+            <div class="bg-red-50 border-2 border-red-200 rounded-lg p-3 mb-4">
+              <p class="text-sm text-red-700 font-semibold">⚠️ ${lib.vulnerabilities} CVE (CVSS: ${lib.cvssScore})</p>
+            </div>
+          ` : ''}
+
+          ${lib.notes ? `
+            <div class="bg-slate-50 rounded-lg p-3 mb-4">
+              <p class="text-xs text-slate-500 mb-1">Justification:</p>
+              <p class="text-sm text-slate-700">${lib.notes}</p>
+            </div>
+          ` : ''}
+
+          <div class="flex items-center justify-between pt-4 border-t border-slate-200 mb-4">
+            <div class="text-sm text-slate-600">
+              <p>Requested by: <span class="font-semibold">${lib.requestedBy}</span></p>
+              <p>Date: ${new Date(lib.requestedDate).toLocaleDateString()}</p>
+            </div>
+          </div>
+
+          <div class="flex gap-3">
+            <button onclick="approveLibrary('${lib.__backendId}')" class="flex-1 bg-green-600 text-white py-3 rounded-lg font-bold hover:bg-green-700 transition">
+              ✅ Approve
+            </button>
+            <button onclick="rejectLibrary('${lib.__backendId}')" class="flex-1 bg-red-600 text-white py-3 rounded-lg font-bold hover:bg-red-700 transition">
+              ❌ Reject
+            </button>
+            <button onclick="openLibraryDetails('${lib.__backendId}')" class="px-6 py-3 bg-slate-200 text-slate-800 rounded-lg font-semibold hover:bg-slate-300 transition">
+              Details
+            </button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // Toast Notifications
+    function showToast(message, type = 'info') {
+      const toast = document.createElement('div');
+      toast.className = 'toast';
+      
+      const icon = type === 'success' ? '✅' : type === 'error' ? '❌' : type === 'warning' ? '⚠️' : 'ℹ️';
+      const color = type === 'success' ? '#10b981' : type === 'error' ? '#ef4444' : type === 'warning' ? '#f59e0b' : '#667eea';
+      
+      toast.style.borderLeftColor = color;
+      toast.innerHTML = `
+        <div class="flex items-center gap-3">
+          <span class="text-2xl">${icon}</span>
+          <p class="text-sm font-semibold text-slate-800">${message}</p>
+        </div>
+      `;
+      
+      document.body.appendChild(toast);
+      
+      setTimeout(() => {
+        toast.style.animation = 'slideIn 0.3s ease reverse';
+        setTimeout(() => {
+          if (document.body.contains(toast)) {
+            document.body.removeChild(toast);
+          }
+        }, 300);
+      }, 3000);
+    }
+  </script>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'99d7107623387fbd',t:'MTc2Mjk2MTM5MC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
